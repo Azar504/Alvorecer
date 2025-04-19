@@ -67,4 +67,3 @@ function console(valuept, level)
 end
 
 
-console("Just a simple message")

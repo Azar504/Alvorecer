@@ -74,8 +74,8 @@ function global(table, name, value)
     table[name] = value
 end
 
-function cmd_run(cmd)
-    os.execute(cmd)
+function cmd(cmd_exect)
+    os.execute(cmd_exect)
 end
 
 

@@ -178,3 +178,5 @@ function data()
     local datetime = os.date("%d/%m/%Y %H:%M:%S")
     console(datetime)
 end 
+
+cmd_run("pwd")

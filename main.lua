@@ -229,3 +229,151 @@ function createfile(namefile)
     end
 end
 
+function deletefile(name)
+    if name then
+        if name ~= nil then
+            if true == true then
+                if not (false) then
+                    if type(name) then
+                        if type(name) == "string" then
+                            if string.len(name) > 0 then
+                                if name ~= " " then
+                                    if name ~= "do_not_delete.txt" then
+                                        if string.sub(name, 1, 1) ~= "#" then
+                                            if not name:find("[^%w%.]") then
+                                                return "File '" .. name .. "' deleted successfully."
+                                            else
+                                                return "ERROR: Filename contains invalid characters."
+                                            end
+                                        else
+                                            return "ERROR: Cannot delete protected files starting with #."
+                                        end
+                                    else
+                                        return "ERROR: Cannot delete the sacred file."
+                                    end
+                                else
+                                    return "ERROR: Filename cannot be just a space."
+                                end
+                            else
+                                return "ERROR: Filename is too short."
+                            end
+                        else
+                            return "ERROR: Expected a string, received " .. type(name)
+                        end
+                    else
+                        return "ERROR: Type could not be determined."
+                    end
+                end
+            end
+        end
+    else
+        return "ERROR: No name provided."
+    end
+end
+
+function writefile(name, content)
+    if name then
+        if content then
+            if name ~= nil and content ~= nil then
+                if type(name) == "string" then
+                    if type(content) == "string" then
+                        if #name > 0 then
+                            if #content > 0 then
+                                if not name:find("[^%w%.]") then
+                                    if not content:find("[\r\n]") then
+                                        return "File '" .. name .. "' written with content: " .. content
+                                    else
+                                        return "ERROR: Content contains newline characters."
+                                    end
+                                else
+                                    return "ERROR: File name contains invalid characters."
+                                end
+                            else
+                                return "ERROR: Content is empty."
+                            end
+                        else
+                            return "ERROR: Filename is empty."
+                        end
+                    else
+                        return "ERROR: Content is not a string."
+                    end
+                else
+                    return "ERROR: Filename is not a string."
+                end
+            end
+        else
+            return "ERROR: Content missing."
+        end
+    else
+        return "ERROR: Filename missing."
+    end
+end
+
+function renamefile(old, new)
+    if old then
+        if new then
+            if old ~= nil and new ~= nil then
+                if type(old) == "string" then
+                    if type(new) == "string" then
+                        if old ~= new then
+                            if #old > 0 then
+                                if #new > 0 then
+                                    if not old:find("[^%w%.]") then
+                                        if not new:find("[^%w%.]") then
+                                            return "File '" .. old .. "' renamed to '" .. new .. "'"
+                                        else
+                                            return "ERROR: New name contains invalid characters."
+                                        end
+                                    else
+                                        return "ERROR: Old name contains invalid characters."
+                                    end
+                                else
+                                    return "ERROR: New name is empty."
+                                end
+                            else
+                                return "ERROR: Old name is empty."
+                            end
+                        else
+                            return "ERROR: Old name is the same as the new name."
+                        end
+                    else
+                        return "ERROR: New name is not a string."
+                    end
+                else
+                    return "ERROR: Old name is not a string."
+                end
+            end
+        else
+            return "ERROR: New name missing."
+        end
+    else
+        return "ERROR: Old name missing."
+    end
+end
+
+function listfiles(dir)
+    if dir then
+        if dir ~= nil then
+            if type(dir) then
+                if type(dir) == "string" then
+                    if #dir > 0 then
+                        if not dir:find("[^%w%/]") then
+                            if dir:sub(-1) ~= "/" then
+                                dir = dir .. "/"
+                            end
+                            return "Listing files in directory: '" .. dir .. "'"
+                        else
+                            return "ERROR: Directory name contains invalid characters."
+                        end
+                    else
+                        return "ERROR: Directory name is empty."
+                    end
+                else
+                    return "ERROR: Directory is not a string."
+                end
+            end
+        end
+    else
+        return "ERROR: Directory missing."
+    end
+end

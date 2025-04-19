@@ -1,0 +1,1 @@
+> I'm just starting to study Lua, but since I already have experience with other languages, I decided to challenge myself by creating a descriptive and functional language based on Lua. It runs exclusively in Lua environments, since it is interpreted directly by a main file ('main.lua'), which must be imported into your project. Documentation will be available soon.

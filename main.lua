@@ -74,11 +74,57 @@ function global(table, name, value)
     table[name] = value
 end
 
-
--------------------------------
--- Command Execution (Linux)
--------------------------------
-
 function cmd_run(cmd)
     os.execute(cmd)
 end
+
+
+function foreach(list, value, opts)
+    if list then 
+        if type(list) == "table" then
+            if value ~= nil then
+                if opts == nil or type(opts) == "table" then
+                    local return_error = false
+                    if opts then
+                         if opts.return_error ~= nil then
+                             if type(opts.return_error) == "boolean" then
+                                 return_error = opts.return_error
+                                 else
+                                     return "ERROR: 'return_error', must be boolean"
+                             end
+                         end
+                    end
+                         if #list > 0 then
+                             for i,v in ipairs(list) do
+                                 if v == value then
+                                     return "Value at found index ".. i
+                                 end
+                             end
+                             if return_error then
+                                 return "ERROR; Value not found in the list."
+                                 
+                                 else
+                                     return ""
+                             end
+                             else
+                                 return "ERROR; the list is empty"
+                         end
+                             else
+                                 return "ERROR; options must be a table nil"
+                end
+                             else
+                                 return "ERROR; A Value to search must be proviend"
+            end
+                             else
+                                 return "ERROR; first argument must be a table"
+        end
+                             else
+                                 return "ERROR; no list proviend"
+    end
+end
+                    
+                    
+                    
+                    
+                    
+                    

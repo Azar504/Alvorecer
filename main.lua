@@ -66,4 +66,19 @@ function console(valuept, level)
 
 end
 
+function echo(printvalue)
+    print(printvalue)
+end
 
+function global(table, name, value)
+    table[name] = value
+end
+
+
+-------------------------------
+-- Command Execution (Linux)
+-------------------------------
+
+function cmd_run(cmd)
+    os.execute(cmd)
+end

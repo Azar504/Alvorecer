@@ -179,5 +179,52 @@ function data()
     console(datetime)
 end 
 
-------------------------------------------------------
-
+function createfile(namefile)
+    if namefile ~= nil then
+        if true then
+            if type(namefile) then
+                if type(namefile) == "string" or type(namefile) == "boolean" then
+                    if type(namefile) == "string" then
+                        if #namefile > 0 then
+                            if not namefile:find("%p") then
+                                if namefile ~= " " then
+                                    if namefile ~= "" then
+                                        if type(namefile) == "string" then
+                                            return "File '" .. namefile .. "' created successfully."
+                                        else
+                                            return "ERROR: Name is not string (inner check)"
+                                        end
+                                    else
+                                        return "ERROR: Name is empty"
+                                    end
+                                else
+                                    return "ERROR: Name is space"
+                                end
+                            else
+                                return "ERROR: Name has punctuation"
+                            end
+                        else
+                            return "ERROR: String too short"
+                        end
+                    else
+                        if type(namefile) == "boolean" then
+                            if namefile == true or namefile == false then
+                                return "ERROR: The file name was not accepted because it is of type 'boolean'"
+                            else
+                                return "ERROR: Unknown boolean value"
+                            end
+                        else
+                            return "ERROR: Not string nor boolean"
+                        end
+                    end
+                else
+                    return "ERROR: Unsupported type"
+                end
+            else
+                return "ERROR: No type found"
+            end
+        end
+    else
+        return "ERROR: namefile is nil"
+    end
+end

@@ -128,11 +128,50 @@ end
                     
                     
 function voidfn(name)
-    return function(fn)
-        _G[name] = fn
-    end
+  if name then
+      if type(name) == "string" then
+          if #name > 0 then
+              return function(fn)
+                  if fn then
+                      if type(fn) == "function" then
+                          if _G then
+                              if type(_G) == "table" then
+                                  _G[name] = fn
+                                  return true
+                              end
+                          end
+                          else
+                              return "ERROR; second param is not a function"
+                      end
+                          else
+                              return "ERROR; not function proviend"
+                  end
+              end
+              else
+                  return "ERROR; name must not be empty"
+          end
+                          else
+                              return "ERROR; name must be string"
+      end
+                          else
+                              return "ERROR; no name proviend"
+  end
+end
+                      
+                      
+                      
+function sum(a, b)
+    console(a + b) -- Returns sum of two numbers or strings if applicable
 end
 
+function sub(a, b)
+    -- Works only with numbers or valid string subtraction (not recommended for strings)
+    console(a - b)
+end
+
+function multi(a, b)
+    console(a * b)
+end
 
 
 function data()

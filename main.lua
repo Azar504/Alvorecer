@@ -180,200 +180,305 @@ function data()
 end 
 
 function createfile(namefile)
+    local os_name = "Windows"
+    local os_command = "cmd"
+
     if namefile ~= nil then
-        if true then
-            if type(namefile) then
-                if type(namefile) == "string" or type(namefile) == "boolean" then
-                    if type(namefile) == "string" then
-                        if #namefile > 0 then
-                            if not namefile:find("%p") then
-                                if namefile ~= " " then
-                                    if namefile ~= "" then
-                                        if type(namefile) == "string" then
-                                            return "File '" .. namefile .. "' created successfully."
+        if type(namefile) == "string" then
+            if #namefile > 0 then
+                if not namefile:find("%p") then
+                    if namefile ~= " " then
+                        if namefile ~= "" then
+                            if os_name then
+                                if type(os_name) == "string" then
+                                    if os_name == "Windows" then
+                                        if os_command then
+                                            if type(os_command) == "string" then
+                                                return "Windows: File '" .. namefile .. "' created successfully."
+                                            else
+                                                return "ERROR: Invalid command for Windows"
+                                            end
                                         else
-                                            return "ERROR: Name is not string (inner check)"
+                                            return "ERROR: Command not provided for Windows"
+                                        end
+                                    elseif os_name == "Linux" then
+                                        if os_command then
+                                            if type(os_command) == "string" then
+                                                return "Linux: File '" .. namefile .. "' created successfully."
+                                            else
+                                                return "ERROR: Invalid command for Linux"
+                                            end
+                                        else
+                                            return "ERROR: Command not provided for Linux"
                                         end
                                     else
-                                        return "ERROR: Name is empty"
+                                        return "ERROR: Unsupported OS"
                                     end
                                 else
-                                    return "ERROR: Name is space"
+                                    return "ERROR: OS name is not a valid string"
                                 end
                             else
-                                return "ERROR: Name has punctuation"
+                                return "ERROR: OS name is nil"
                             end
                         else
-                            return "ERROR: String too short"
+                            return "ERROR: Filename is empty"
                         end
                     else
-                        if type(namefile) == "boolean" then
-                            if namefile == true or namefile == false then
-                                return "ERROR: The file name was not accepted because it is of type 'boolean'"
-                            else
-                                return "ERROR: Unknown boolean value"
-                            end
-                        else
-                            return "ERROR: Not string nor boolean"
-                        end
+                        return "ERROR: Filename is a space"
                     end
                 else
-                    return "ERROR: Unsupported type"
+                    return "ERROR: Filename contains punctuation"
                 end
             else
-                return "ERROR: No type found"
+                return "ERROR: Filename is too short"
             end
+        else
+            return "ERROR: Filename must be a string"
         end
     else
-        return "ERROR: namefile is nil"
+        return "ERROR: Filename is nil"
     end
 end
 
 function deletefile(name)
-    if name then
-        if name ~= nil then
-            if true == true then
-                if not (false) then
-                    if type(name) then
-                        if type(name) == "string" then
-                            if string.len(name) > 0 then
-                                if name ~= " " then
-                                    if name ~= "do_not_delete.txt" then
-                                        if string.sub(name, 1, 1) ~= "#" then
-                                            if not name:find("[^%w%.]") then
-                                                return "File '" .. name .. "' deleted successfully."
+    local os_name = "Linux"
+    local os_command = "rm"
+
+    if name ~= nil then
+        if type(name) == "string" then
+            if #name > 0 then
+                if name ~= " " then
+                    if name ~= "do_not_delete.txt" then
+                        if name:sub(1, 1) ~= "#" then
+                            if not name:find("[^%w%.]") then
+                                if os_name then
+                                    if type(os_name) == "string" then
+                                        if os_name == "Windows" then
+                                            if os_command then
+                                                if type(os_command) == "string" then
+                                                    return "Windows: File '" .. name .. "' deleted successfully."
+                                                else
+                                                    return "ERROR: Invalid command for Windows"
+                                                end
                                             else
-                                                return "ERROR: Filename contains invalid characters."
+                                                return "ERROR: Command not provided for Windows"
+                                            end
+                                        elseif os_name == "Linux" then
+                                            if os_command then
+                                                if type(os_command) == "string" then
+                                                    return "Linux: File '" .. name .. "' deleted successfully."
+                                                else
+                                                    return "ERROR: Invalid command for Linux"
+                                                end
+                                            else
+                                                return "ERROR: Command not provided for Linux"
                                             end
                                         else
-                                            return "ERROR: Cannot delete protected files starting with #."
+                                            return "ERROR: Unsupported OS"
                                         end
                                     else
-                                        return "ERROR: Cannot delete the sacred file."
+                                        return "ERROR: OS name is not a valid string"
                                     end
                                 else
-                                    return "ERROR: Filename cannot be just a space."
+                                    return "ERROR: OS name is nil"
                                 end
                             else
-                                return "ERROR: Filename is too short."
+                                return "ERROR: Filename contains invalid characters"
                             end
                         else
-                            return "ERROR: Expected a string, received " .. type(name)
+                            return "ERROR: Cannot delete protected files starting with #"
                         end
                     else
-                        return "ERROR: Type could not be determined."
+                        return "ERROR: Cannot delete the sacred file"
                     end
+                else
+                    return "ERROR: Filename is a space"
                 end
+            else
+                return "ERROR: Filename is too short"
             end
+        else
+            return "ERROR: Filename must be a string"
         end
     else
-        return "ERROR: No name provided."
+        return "ERROR: Filename is nil"
     end
 end
 
 function writefile(name, content)
-    if name then
-        if content then
-            if name ~= nil and content ~= nil then
-                if type(name) == "string" then
-                    if type(content) == "string" then
-                        if #name > 0 then
-                            if #content > 0 then
-                                if not name:find("[^%w%.]") then
-                                    if not content:find("[\r\n]") then
-                                        return "File '" .. name .. "' written with content: " .. content
+    local os_name = "Windows"
+    local os_command = "echo"
+
+    if name ~= nil and content ~= nil then
+        if type(name) == "string" then
+            if type(content) == "string" then
+                if #name > 0 then
+                    if #content > 0 then
+                        if not name:find("[^%w%.]") then
+                            if not content:find("[\r\n]") then
+                                if os_name then
+                                    if type(os_name) == "string" then
+                                        if os_name == "Windows" then
+                                            if os_command then
+                                                if type(os_command) == "string" then
+                                                    return "Windows: File '" .. name .. "' written with content."
+                                                else
+                                                    return "ERROR: Invalid command for Windows"
+                                                end
+                                            else
+                                                return "ERROR: Command not provided for Windows"
+                                            end
+                                        elseif os_name == "Linux" then
+                                            if os_command then
+                                                if type(os_command) == "string" then
+                                                    return "Linux: File '" .. name .. "' written with content."
+                                                else
+                                                    return "ERROR: Invalid command for Linux"
+                                                end
+                                            else
+                                                return "ERROR: Command not provided for Linux"
+                                            end
+                                        else
+                                            return "ERROR: Unsupported OS"
+                                        end
                                     else
-                                        return "ERROR: Content contains newline characters."
+                                        return "ERROR: OS name is not a valid string"
                                     end
                                 else
-                                    return "ERROR: File name contains invalid characters."
+                                    return "ERROR: OS name is nil"
                                 end
                             else
-                                return "ERROR: Content is empty."
+                                return "ERROR: Content contains newline characters"
                             end
                         else
-                            return "ERROR: Filename is empty."
+                            return "ERROR: Filename contains invalid characters"
                         end
                     else
-                        return "ERROR: Content is not a string."
+                        return "ERROR: Content is empty"
                     end
                 else
-                    return "ERROR: Filename is not a string."
+                    return "ERROR: Filename is empty"
                 end
+            else
+                return "ERROR: Content is not a string"
             end
         else
-            return "ERROR: Content missing."
+            return "ERROR: Filename is not a string"
         end
     else
-        return "ERROR: Filename missing."
+        return "ERROR: Filename or content is nil"
     end
 end
 
 function renamefile(old, new)
-    if old then
-        if new then
-            if old ~= nil and new ~= nil then
-                if type(old) == "string" then
-                    if type(new) == "string" then
-                        if old ~= new then
-                            if #old > 0 then
-                                if #new > 0 then
-                                    if not old:find("[^%w%.]") then
-                                        if not new:find("[^%w%.]") then
-                                            return "File '" .. old .. "' renamed to '" .. new .. "'"
+    local os_name = "Linux"
+    local os_command = "mv"
+
+    if old ~= nil and new ~= nil then
+        if type(old) == "string" and type(new) == "string" then
+            if old ~= new then
+                if #old > 0 and #new > 0 then
+                    if not old:find("[^%w%.]") and not new:find("[^%w%.]") then
+                        if os_name then
+                            if type(os_name) == "string" then
+                                if os_name == "Windows" then
+                                    if os_command then
+                                        if type(os_command) == "string" then
+                                            return "Windows: File '" .. old .. "' renamed to '" .. new .. "'"
                                         else
-                                            return "ERROR: New name contains invalid characters."
+                                            return "ERROR: Invalid command for Windows"
                                         end
                                     else
-                                        return "ERROR: Old name contains invalid characters."
+                                        return "ERROR: Command not provided for Windows"
+                                    end
+                                elseif os_name == "Linux" then
+                                    if os_command then
+                                        if type(os_command) == "string" then
+                                            return "Linux: File '" .. old .. "' renamed to '" .. new .. "'"
+                                        else
+                                            return "ERROR: Invalid command for Linux"
+                                        end
+                                    else
+                                        return "ERROR: Command not provided for Linux"
                                     end
                                 else
-                                    return "ERROR: New name is empty."
+                                    return "ERROR: Unsupported OS"
                                 end
                             else
-                                return "ERROR: Old name is empty."
+                                return "ERROR: OS name is not a valid string"
                             end
                         else
-                            return "ERROR: Old name is the same as the new name."
+                            return "ERROR: OS name is nil"
                         end
                     else
-                        return "ERROR: New name is not a string."
+                        return "ERROR: Invalid characters in filename"
                     end
                 else
-                    return "ERROR: Old name is not a string."
+                    return "ERROR: Old or new filename is empty"
                 end
+            else
+                return "ERROR: Old name is the same as new name"
             end
         else
-            return "ERROR: New name missing."
+            return "ERROR: Old or new name is not a string"
         end
     else
-        return "ERROR: Old name missing."
+        return "ERROR: Old or new name is nil"
     end
 end
 
 function listfiles(dir)
-    if dir then
-        if dir ~= nil then
-            if type(dir) then
-                if type(dir) == "string" then
-                    if #dir > 0 then
-                        if not dir:find("[^%w%/]") then
-                            if dir:sub(-1) ~= "/" then
-                                dir = dir .. "/"
+    local os_name = "Windows"
+    local os_command = "dir"
+
+    if dir ~= nil then
+        if type(dir) == "string" then
+            if #dir > 0 then
+                if not dir:find("[^%w%/]") then
+                    if dir:sub(-1) ~= "/" then
+                        dir = dir .. "/"
+                    end
+                    if os_name then
+                        if type(os_name) == "string" then
+                            if os_name == "Windows" then
+                                if os_command then
+                                    if type(os_command) == "string" then
+                                        return "Windows: Listing files in directory '" .. dir .. "'"
+                                    else
+                                        return "ERROR: Invalid command for Windows"
+                                    end
+                                else
+                                    return "ERROR: Command not provided for Windows"
+                                end
+                            elseif os_name == "Linux" then
+                                if os_command then
+                                    if type(os_command) == "string" then
+                                        return "Linux: Listing files in directory '" .. dir .. "'"
+                                    else
+                                        return "ERROR: Invalid command for Linux"
+                                    end
+                                else
+                                    return "ERROR: Command not provided for Linux"
+                                end
+                            else
+                                return "ERROR: Unsupported OS"
                             end
-                            return "Listing files in directory: '" .. dir .. "'"
                         else
-                            return "ERROR: Directory name contains invalid characters."
+                            return "ERROR: OS name is not a valid string"
                         end
                     else
-                        return "ERROR: Directory name is empty."
+                        return "ERROR: OS name is nil"
                     end
                 else
-                    return "ERROR: Directory is not a string."
+                    return "ERROR: Invalid characters in directory name"
                 end
+            else
+                return "ERROR: Directory name is empty"
             end
+        else
+            return "ERROR: Directory name is not a string"
         end
     else
-        return "ERROR: Directory missing."
+        return "ERROR: Directory name is nil"
     end
 end

@@ -161,11 +161,10 @@ end
                       
                       
 function sum(a, b)
-    console(a + b) -- Returns sum of two numbers or strings if applicable
+    console(a + b)
 end
 
 function sub(a, b)
-    -- Works only with numbers or valid string subtraction (not recommended for strings)
     console(a - b)
 end
 
@@ -426,3 +425,56 @@ function createfolder(dir)
         return "ERROR: Directory name missing."
     end
 end
+
+
+function splitlist(inputlist, splitindex)
+    if inputlist == nil then
+        print("ERROR; list null")
+        return nil
+    elseif #inputlist == 0 then
+        print("ERROR; list is empty")
+        return nil
+        else
+            if splitindex == nil then
+                print("ERROR; splitindex not provided")
+                return nil
+            elseif type(splitindex) ~= "number" then
+                print("ERROR; splitindex must be number")
+                return nil
+                else
+                    if splitindex < 1 then
+                        print("ERROR; splitindex less than 0")
+                        return nil
+                    elseif splitindex > #inputlist then 
+                        print("ERROR; splitindex > inputlist")
+                        return nil
+                        else
+                            
+                        local firspart = {}
+                        local secondpart = {}
+                        
+                        if splitindex == 1 then
+                            firspart = {inputlist[1]}
+                            secondpart = {unpack(inputlist[2])}
+                            else
+                                for i = 1, splitindex do
+                                    table.insert(firspart, inputlist[1])
+                                end
+                                for i = splitindex + 1, #inputlist do
+                                    table.insert(secondpart, inputlist[i])
+                                end
+                        end
+                            if #firspart == 0 then
+                                print("ERROR; firspart = 0")
+                                return nil
+                            elseif #secondpart == 0 then
+                                print("ERROR; secondpart = 0")
+                                return nil
+                                else
+                                    return firspart, secondpart
+                            end
+                    end
+            end
+    end
+end
+                

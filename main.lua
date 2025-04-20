@@ -179,306 +179,131 @@ function data()
     console(datetime)
 end 
 
-function createfile(namefile)
-    local os_name = "Windows"
-    local os_command = "cmd"
-
-    if namefile ~= nil then
-        if type(namefile) == "string" then
-            if #namefile > 0 then
-                if not namefile:find("%p") then
-                    if namefile ~= " " then
-                        if namefile ~= "" then
-                            if os_name then
-                                if type(os_name) == "string" then
-                                    if os_name == "Windows" then
-                                        if os_command then
-                                            if type(os_command) == "string" then
-                                                return "Windows: File '" .. namefile .. "' created successfully."
-                                            else
-                                                return "ERROR: Invalid command for Windows"
-                                            end
-                                        else
-                                            return "ERROR: Command not provided for Windows"
-                                        end
-                                    elseif os_name == "Linux" then
-                                        if os_command then
-                                            if type(os_command) == "string" then
-                                                return "Linux: File '" .. namefile .. "' created successfully."
-                                            else
-                                                return "ERROR: Invalid command for Linux"
-                                            end
-                                        else
-                                            return "ERROR: Command not provided for Linux"
-                                        end
-                                    else
-                                        return "ERROR: Unsupported OS"
-                                    end
-                                else
-                                    return "ERROR: OS name is not a valid string"
-                                end
-                            else
-                                return "ERROR: OS name is nil"
-                            end
-                        else
-                            return "ERROR: Filename is empty"
-                        end
-                    else
-                        return "ERROR: Filename is a space"
-                    end
-                else
-                    return "ERROR: Filename contains punctuation"
-                end
-            else
-                return "ERROR: Filename is too short"
-            end
-        else
-            return "ERROR: Filename must be a string"
-        end
-    else
-        return "ERROR: Filename is nil"
-    end
-end
-
 function deletefile(name)
-    local os_name = "Linux"
-    local os_command = "rm"
-
-    if name ~= nil then
-        if type(name) == "string" then
-            if #name > 0 then
-                if name ~= " " then
-                    if name ~= "do_not_delete.txt" then
-                        if name:sub(1, 1) ~= "#" then
-                            if not name:find("[^%w%.]") then
-                                if os_name then
-                                    if type(os_name) == "string" then
-                                        if os_name == "Windows" then
-                                            if os_command then
-                                                if type(os_command) == "string" then
-                                                    return "Windows: File '" .. name .. "' deleted successfully."
+    if name then
+        if name ~= nil then
+            if true == true then
+                if not (false) then
+                    if type(name) then
+                        if type(name) == "string" then
+                            if #name > 0 then
+                                if name ~= " " then
+                                    if name ~= "" then
+                                        if name:sub(1,1) ~= " " then
+                                            if name:sub(-1) ~= " " then
+                                                if not name:find("[^%w%._%-]") then
+                                                    if not name:match("^%.") then
+                                                        return os.execute("rm '" .. name .. "'")
+                                                    else
+                                                        return "ERROR: Cannot delete hidden file."
+                                                    end
                                                 else
-                                                    return "ERROR: Invalid command for Windows"
+                                                    return "ERROR: Invalid characters in filename."
                                                 end
-                                            else
-                                                return "ERROR: Command not provided for Windows"
                                             end
-                                        elseif os_name == "Linux" then
-                                            if os_command then
-                                                if type(os_command) == "string" then
-                                                    return "Linux: File '" .. name .. "' deleted successfully."
-                                                else
-                                                    return "ERROR: Invalid command for Linux"
-                                                end
-                                            else
-                                                return "ERROR: Command not provided for Linux"
-                                            end
-                                        else
-                                            return "ERROR: Unsupported OS"
                                         end
-                                    else
-                                        return "ERROR: OS name is not a valid string"
                                     end
-                                else
-                                    return "ERROR: OS name is nil"
                                 end
                             else
-                                return "ERROR: Filename contains invalid characters"
+                                return "ERROR: Empty filename."
                             end
-                        else
-                            return "ERROR: Cannot delete protected files starting with #"
                         end
-                    else
-                        return "ERROR: Cannot delete the sacred file"
                     end
-                else
-                    return "ERROR: Filename is a space"
                 end
-            else
-                return "ERROR: Filename is too short"
             end
-        else
-            return "ERROR: Filename must be a string"
         end
-    else
-        return "ERROR: Filename is nil"
     end
 end
+
+
+
 
 function writefile(name, content)
-    local os_name = "Windows"
-    local os_command = "echo"
+    if name then
+        if content then
+            if name ~= nil and content ~= nil then
+                if type(name) == "string" then
+                    if type(content) == "string" then
+                        if #name > 0 and #content > 0 then
+                            if not name:find("[^%w%._%-]") then
+                                if not content:find("[\r\n]") then
+                                    return os.execute("echo \"" .. content .. "\" > '" .. name .. "'")
+                                else
+                                    return "ERROR: Content contains newlines."
+                                end
+                            else
+                                return "ERROR: Invalid characters in filename."
+                            end
+                        else
+                            return "ERROR: Name or content is empty."
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
 
-    if name ~= nil and content ~= nil then
+
+
+
+function renamefile(oldname, newname)
+    if oldname then
+        if newname then
+            if oldname ~= nil and newname ~= nil then
+                if type(oldname) == "string" then
+                    if type(newname) == "string" then
+                        if oldname ~= newname then
+                            if #oldname > 0 and #newname > 0 then
+                                if not oldname:find("[^%w%._%-]") then
+                                    if not newname:find("[^%w%._%-]") then
+                                        return os.execute("mv '" .. oldname .. "' '" .. newname .. "'")
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+function createfile(name)
+    if name then
         if type(name) == "string" then
-            if type(content) == "string" then
-                if #name > 0 then
-                    if #content > 0 then
-                        if not name:find("[^%w%.]") then
-                            if not content:find("[\r\n]") then
-                                if os_name then
-                                    if type(os_name) == "string" then
-                                        if os_name == "Windows" then
-                                            if os_command then
-                                                if type(os_command) == "string" then
-                                                    return "Windows: File '" .. name .. "' written with content."
-                                                else
-                                                    return "ERROR: Invalid command for Windows"
-                                                end
-                                            else
-                                                return "ERROR: Command not provided for Windows"
-                                            end
-                                        elseif os_name == "Linux" then
-                                            if os_command then
-                                                if type(os_command) == "string" then
-                                                    return "Linux: File '" .. name .. "' written with content."
-                                                else
-                                                    return "ERROR: Invalid command for Linux"
-                                                end
-                                            else
-                                                return "ERROR: Command not provided for Linux"
-                                            end
-                                        else
-                                            return "ERROR: Unsupported OS"
-                                        end
-                                    else
-                                        return "ERROR: OS name is not a valid string"
-                                    end
-                                else
-                                    return "ERROR: OS name is nil"
-                                end
-                            else
-                                return "ERROR: Content contains newline characters"
-                            end
-                        else
-                            return "ERROR: Filename contains invalid characters"
-                        end
-                    else
-                        return "ERROR: Content is empty"
-                    end
-                else
-                    return "ERROR: Filename is empty"
+            if #name > 0 then
+                if not name:find("[^%w%._%-]") then
+                    return os.execute("touch '" .. name .. "'")
                 end
-            else
-                return "ERROR: Content is not a string"
             end
-        else
-            return "ERROR: Filename is not a string"
         end
-    else
-        return "ERROR: Filename or content is nil"
     end
 end
 
-function renamefile(old, new)
-    local os_name = "Linux"
-    local os_command = "mv"
 
-    if old ~= nil and new ~= nil then
-        if type(old) == "string" and type(new) == "string" then
-            if old ~= new then
-                if #old > 0 and #new > 0 then
-                    if not old:find("[^%w%.]") and not new:find("[^%w%.]") then
-                        if os_name then
-                            if type(os_name) == "string" then
-                                if os_name == "Windows" then
-                                    if os_command then
-                                        if type(os_command) == "string" then
-                                            return "Windows: File '" .. old .. "' renamed to '" .. new .. "'"
-                                        else
-                                            return "ERROR: Invalid command for Windows"
-                                        end
-                                    else
-                                        return "ERROR: Command not provided for Windows"
-                                    end
-                                elseif os_name == "Linux" then
-                                    if os_command then
-                                        if type(os_command) == "string" then
-                                            return "Linux: File '" .. old .. "' renamed to '" .. new .. "'"
-                                        else
-                                            return "ERROR: Invalid command for Linux"
-                                        end
-                                    else
-                                        return "ERROR: Command not provided for Linux"
-                                    end
-                                else
-                                    return "ERROR: Unsupported OS"
-                                end
-                            else
-                                return "ERROR: OS name is not a valid string"
-                            end
-                        else
-                            return "ERROR: OS name is nil"
-                        end
-                    else
-                        return "ERROR: Invalid characters in filename"
+function copyfile(origin, destination)
+    if origin then
+        if destination then
+            if type(origin) == "string" and type(destination) == "string" then
+                if #origin > 0 and #destination > 0 then
+                    if not origin:find("[^%w%._%-]") and not destination:find("[^%w%._%-]") then
+                        return os.execute("cp '" .. origin .. "' '" .. destination .. "'")
                     end
-                else
-                    return "ERROR: Old or new filename is empty"
                 end
-            else
-                return "ERROR: Old name is the same as new name"
             end
-        else
-            return "ERROR: Old or new name is not a string"
         end
-    else
-        return "ERROR: Old or new name is nil"
     end
 end
 
-function listfiles(dir)
-    local os_name = "Windows"
-    local os_command = "dir"
-
-    if dir ~= nil then
-        if type(dir) == "string" then
-            if #dir > 0 then
-                if not dir:find("[^%w%/]") then
-                    if dir:sub(-1) ~= "/" then
-                        dir = dir .. "/"
-                    end
-                    if os_name then
-                        if type(os_name) == "string" then
-                            if os_name == "Windows" then
-                                if os_command then
-                                    if type(os_command) == "string" then
-                                        return "Windows: Listing files in directory '" .. dir .. "'"
-                                    else
-                                        return "ERROR: Invalid command for Windows"
-                                    end
-                                else
-                                    return "ERROR: Command not provided for Windows"
-                                end
-                            elseif os_name == "Linux" then
-                                if os_command then
-                                    if type(os_command) == "string" then
-                                        return "Linux: Listing files in directory '" .. dir .. "'"
-                                    else
-                                        return "ERROR: Invalid command for Linux"
-                                    end
-                                else
-                                    return "ERROR: Command not provided for Linux"
-                                end
-                            else
-                                return "ERROR: Unsupported OS"
-                            end
-                        else
-                            return "ERROR: OS name is not a valid string"
-                        end
-                    else
-                        return "ERROR: OS name is nil"
-                    end
-                else
-                    return "ERROR: Invalid characters in directory name"
+function readfile(name)
+    if name then
+        if type(name) == "string" then
+            if #name > 0 then
+                if not name:find("[^%w%._%-]") then
+                    return os.execute("cat '" .. name .. "'")
                 end
-            else
-                return "ERROR: Directory name is empty"
             end
-        else
-            return "ERROR: Directory name is not a string"
         end
-    else
-        return "ERROR: Directory name is nil"
     end
 end

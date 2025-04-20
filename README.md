@@ -13,12 +13,6 @@
 <!-- Author -->
 <img src="https://img.shields.io/badge/Created_by-Isamytanaka-9370DB?style=flat&logo=github&logoColor=white&labelColor=6A5ACD&color=BA55D3" alt="Created by Isamytanaka">
 
-
-<!-- Version -->
-<a href="https://github.com/isamytanaka/Alvorecer/releases">
-  <img src="https://img.shields.io/badge/Version-0.34-00FA9A?style=flat&logo=semantic-release&logoColor=white&labelColor=006400&color=32CD32" alt="Version 0.34">
-</a>
-
 <!-- Status -->
 <img src="https://img.shields.io/badge/Status-Work_in_Progress-7FFF00?style=flat&logo=githubactions&logoColor=white&labelColor=6B8E23&color=32CD32">
 

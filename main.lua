@@ -178,132 +178,251 @@ function data()
     local datetime = os.date("%d/%m/%Y %H:%M:%S")
     console(datetime)
 end 
-
 function deletefile(name)
     if name then
         if name ~= nil then
-            if true == true then
-                if not (false) then
-                    if type(name) then
-                        if type(name) == "string" then
-                            if #name > 0 then
-                                if name ~= " " then
-                                    if name ~= "" then
-                                        if name:sub(1,1) ~= " " then
-                                            if name:sub(-1) ~= " " then
-                                                if not name:find("[^%w%._%-]") then
-                                                    if not name:match("^%.") then
-                                                        return os.execute("rm '" .. name .. "'")
-                                                    else
-                                                        return "ERROR: Cannot delete hidden file."
-                                                    end
-                                                else
-                                                    return "ERROR: Invalid characters in filename."
-                                                end
-                                            end
-                                        end
-                                    end
-                                end
-                            else
-                                return "ERROR: Empty filename."
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
-end
-
-
-
-
-function writefile(name, content)
-    if name then
-        if content then
-            if name ~= nil and content ~= nil then
+            if type(name) then
                 if type(name) == "string" then
-                    if type(content) == "string" then
-                        if #name > 0 and #content > 0 then
-                            if not name:find("[^%w%._%-]") then
-                                if not content:find("[\r\n]") then
-                                    return os.execute("echo \"" .. content .. "\" > '" .. name .. "'")
+                    if #name > 0 then
+                        if name ~= " " then
+                            if name ~= "do_not_delete.txt" then
+                                if string.sub(name, 1, 1) ~= "#" then
+                                    if not name:find("[^%w%._%-]") then
+                                        if io.open(name, "r") then
+                                            local command = "rm -f " .. name
+                                            local result = os.execute(command)
+                                            if result then
+                                                return "SUCCESS: File '" .. name .. "' deleted."
+                                            else
+                                                return "ERROR: System command failed to execute."
+                                            end
+                                        else
+                                            return "ERROR: File does not exist."
+                                        end
+                                    else
+                                        return "ERROR: Filename contains invalid characters."
+                                    end
                                 else
-                                    return "ERROR: Content contains newlines."
+                                    return "ERROR: Cannot delete files starting with '#'."
                                 end
                             else
-                                return "ERROR: Invalid characters in filename."
+                                return "ERROR: Reserved file cannot be deleted."
                             end
                         else
-                            return "ERROR: Name or content is empty."
+                            return "ERROR: Filename cannot be a blank space."
                         end
+                    else
+                        return "ERROR: Filename too short."
                     end
+                else
+                    return "ERROR: Expected string, got " .. type(name)
                 end
+            else
+                return "ERROR: Could not determine type."
             end
+        else
+            return "ERROR: Filename not provided."
         end
-    end
-end
-
-
-
-
-function renamefile(oldname, newname)
-    if oldname then
-        if newname then
-            if oldname ~= nil and newname ~= nil then
-                if type(oldname) == "string" then
-                    if type(newname) == "string" then
-                        if oldname ~= newname then
-                            if #oldname > 0 and #newname > 0 then
-                                if not oldname:find("[^%w%._%-]") then
-                                    if not newname:find("[^%w%._%-]") then
-                                        return os.execute("mv '" .. oldname .. "' '" .. newname .. "'")
-                                    end
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
+    else
+        return "ERROR: Filename is nil."
     end
 end
 
 function createfile(name)
     if name then
-        if type(name) == "string" then
-            if #name > 0 then
-                if not name:find("[^%w%._%-]") then
-                    return os.execute("touch '" .. name .. "'")
-                end
-            end
-        end
-    end
-end
-
-
-function copyfile(origin, destination)
-    if origin then
-        if destination then
-            if type(origin) == "string" and type(destination) == "string" then
-                if #origin > 0 and #destination > 0 then
-                    if not origin:find("[^%w%._%-]") and not destination:find("[^%w%._%-]") then
-                        return os.execute("cp '" .. origin .. "' '" .. destination .. "'")
+        if name ~= nil then
+            if type(name) then
+                if type(name) == "string" then
+                    if #name > 0 then
+                        if not name:find("[^%w%._%-]") then
+                            local file = io.open(name, "r")
+                            if file then
+                                file:close()
+                                return "ERROR: File already exists."
+                            else
+                                local command = "touch " .. name
+                                local result = os.execute(command)
+                                if result then
+                                    return "SUCCESS: File '" .. name .. "' created."
+                                else
+                                    return "ERROR: Failed to create file via system command."
+                                end
+                            end
+                        else
+                            return "ERROR: Invalid characters in filename."
+                        end
+                    else
+                        return "ERROR: Filename is empty."
                     end
+                else
+                    return "ERROR: Filename must be string."
                 end
+            else
+                return "ERROR: Could not determine type."
             end
+        else
+            return "ERROR: Filename is nil."
         end
+    else
+        return "ERROR: Filename not provided."
     end
 end
 
-function readfile(name)
+function writefile(name, content)
+    if name then
+        if content then
+            if type(name) == "string" then
+                if type(content) == "string" then
+                    if #name > 0 and #content > 0 then
+                        if not name:find("[^%w%._%-]") then
+                            local file = io.open(name, "r")
+                            if file then
+                                file:close()
+                                local command = "echo \"" .. content:gsub('"', '\\"') .. "\" > " .. name
+                                local result = os.execute(command)
+                                if result then
+                                    return "SUCCESS: Content written to '" .. name .. "'."
+                                else
+                                    return "ERROR: Write failed via system command."
+                                end
+                            else
+                                return "ERROR: File does not exist to write."
+                            end
+                        else
+                            return "ERROR: Invalid characters in filename."
+                        end
+                    else
+                        return "ERROR: Filename or content is empty."
+                    end
+                else
+                    return "ERROR: Content must be string."
+                end
+            else
+                return "ERROR: Filename must be string."
+            end
+        else
+            return "ERROR: Missing content."
+        end
+    else
+        return "ERROR: Missing filename."
+    end
+end
+
+function renamefile(old, new)
+    if old then
+        if new then
+            if type(old) == "string" and type(new) == "string" then
+                if #old > 0 and #new > 0 then
+                    if not old:find("[^%w%._%-]") and not new:find("[^%w%._%-]") then
+                        local oldFile = io.open(old, "r")
+                        local newFile = io.open(new, "r")
+                        if oldFile then
+                            oldFile:close()
+                            if newFile then
+                                return "ERROR: New file already exists."
+                            else
+                                local command = "mv " .. old .. " " .. new
+                                local result = os.execute(command)
+                                if result then
+                                    return "SUCCESS: File renamed from '" .. old .. "' to '" .. new .. "'."
+                                else
+                                    return "ERROR: Rename failed via system."
+                                end
+                            end
+                        else
+                            return "ERROR: Old file does not exist."
+                        end
+                    else
+                        return "ERROR: Invalid characters in filenames."
+                    end
+                else
+                    return "ERROR: Empty filenames."
+                end
+            else
+                return "ERROR: Both old and new names must be strings."
+            end
+        else
+            return "ERROR: Missing new name."
+        end
+    else
+        return "ERROR: Missing old name."
+    end
+end
+
+function listfiles(dir)
+    if dir then
+        if type(dir) == "string" then
+            if #dir > 0 then
+                if not dir:find("[^%w%/%._%-]") then
+                    local command = "ls " .. dir
+                    local result = os.execute(command)
+                    if result then
+                        return "SUCCESS: Directory listed."
+                    else
+                        return "ERROR: Failed to list directory."
+                    end
+                else
+                    return "ERROR: Directory contains invalid characters."
+                end
+            else
+                return "ERROR: Directory is empty."
+            end
+        else
+            return "ERROR: Directory must be string."
+        end
+    else
+        return "ERROR: No directory provided."
+    end
+end
+
+function checkpermissions(name)
     if name then
         if type(name) == "string" then
             if #name > 0 then
                 if not name:find("[^%w%._%-]") then
-                    return os.execute("cat '" .. name .. "'")
+                    local command = "ls -l " .. name
+                    local result = os.execute(command)
+                    if result then
+                        return "SUCCESS: File permissions checked for '" .. name .. "'."
+                    else
+                        return "ERROR: Failed to check permissions."
+                    end
+                else
+                    return "ERROR: Invalid characters in filename."
                 end
+            else
+                return "ERROR: Filename is empty."
             end
+        else
+            return "ERROR: Filename must be string."
         end
+    else
+        return "ERROR: No filename provided."
+    end
+end
+
+function createfolder(dir)
+    if dir then
+        if type(dir) == "string" then
+            if #dir > 0 then
+                if not dir:find("[^%w%/%._%-]") then
+                    local command = "mkdir -p " .. dir
+                    local result = os.execute(command)
+                    if result then
+                        return "SUCCESS: Folder '" .. dir .. "' created."
+                    else
+                        return "ERROR: Failed to create folder."
+                    end
+                else
+                    return "ERROR: Invalid characters in directory name."
+                end
+            else
+                return "ERROR: Directory name is empty."
+            end
+        else
+            return "ERROR: Directory name must be string."
+        end
+    else
+        return "ERROR: Directory name missing."
     end
 end

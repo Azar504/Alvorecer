@@ -1,3 +1,12 @@
+function version()
+    local version = 0.36
+    print("Alvorecer framewok - v" .. version)
+end
+
+version()
+    
+
+
 function console(valuept, level)
 
 	if valuept then
@@ -158,20 +167,7 @@ function voidfn(name)
   end
 end
                       
-                      
-                      
-function sum(a, b)
-    console(a + b)
-end
-
-function sub(a, b)
-    console(a - b)
-end
-
-function multi(a, b)
-    console(a * b)
-end
-
+  
 
 function data()
     local datetime = os.date("%d/%m/%Y %H:%M:%S")
@@ -478,3 +474,4 @@ function splitlist(inputlist, splitindex)
             end
     end
 end
+

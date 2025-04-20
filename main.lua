@@ -475,9 +475,68 @@ function splitlist(inputlist, splitindex)
     end
 end
 
-function authu(path)
-    if #path and type(path) == "string" then
-        if #path > 0 then
-            local OStype == package.config:sub(1, 1) == "/" and "linux" or "windows"
-            if OStype os.execute( 
-    
+function grant_max_script_permission(path)
+    if path then
+        if type(path) == "string" then
+            if #path > 0 then
+                local os_type = package.config:sub(1,1) == "/" and "linux" or "windows"
+                if os_type then
+                    if os_type == "linux" then
+                        if os.execute("[ -e '" .. path .. "' ]") == 0 then
+                            if os.execute("[ -f '" .. path .. "' ]") == 0 then
+                                if os.execute("file '" .. path .. "' | grep -q script") == 0 then
+                                    if os.execute("chmod +x '" .. path .. "'") == 0 then
+                                        if os.execute("ls -l '" .. path .. "' | grep -q 'x'") == 0 then
+                                            print("Execution permission successfully granted on Linux!")
+                                        else
+                                            print("Execute flag seems missing after chmod.")
+                                        end
+                                    else
+                                        print("Failed to apply chmod.")
+                                    end
+                                else
+                                    print("The file does not appear to be a script.")
+                                end
+                            else
+                                print("Target is not a regular file.")
+                            end
+                        else
+                            print("File does not exist.")
+                        end
+                    end
+                    if os_type == "windows" then
+                        if os.execute("if exist \"" .. path .. "\" (echo OK)") == 0 then
+                            if path:match("%.bat$") or path:match("%.cmd$") or path:match("%.ps1$") then
+                                if os.execute("attrib -r -h -s \"" .. path .. "\"") == 0 then
+                                    if os.execute("icacls \"" .. path .. "\" /grant Everyone:F") == 0 then
+                                        if os.execute("icacls \"" .. path .. "\" | findstr /C:\"Everyone.*F\"") == 0 then
+                                            print("Full permissions successfully granted on Windows!")
+                                        else
+                                            print("Failed to confirm full permission.")
+                                        end
+                                    else
+                                        print("Failed to set permissions with icacls.")
+                                    end
+                                else
+                                    print("Failed to remove restrictive attributes.")
+                                end
+                            else
+                                print("File extension not recognized as script.")
+                            end
+                        else
+                            print("File does not exist.")
+                        end
+                    end
+                else
+                    print("Unable to detect OS type.")
+                end
+            else
+                print("Path is empty.")
+            end
+        else
+            print("Path is not a string.")
+        end
+    else
+        print("No path provided.")
+    end
+end

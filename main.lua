@@ -475,3 +475,9 @@ function splitlist(inputlist, splitindex)
     end
 end
 
+function authu(path)
+    if #path and type(path) == "string" then
+        if #path > 0 then
+            local OStype == package.config:sub(1, 1) == "/" and "linux" or "windows"
+            if OStype os.execute( 
+    

@@ -175,7 +175,8 @@ end
 
 function data()
     local datetime = os.date("%d/%m/%Y %H:%M:%S")
-    console(datetime)
+    print(datetime)
+    return datetime
 end 
 function deletefile(name)
     if name then
@@ -477,4 +478,3 @@ function splitlist(inputlist, splitindex)
             end
     end
 end
-                

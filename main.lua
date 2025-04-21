@@ -475,7 +475,7 @@ function splitlist(inputlist, splitindex)
     end
 end
 
-function grant_max_script_permission(path)
+function grant_max_permission(path)
     if path then
         if type(path) == "string" then
             if #path > 0 then

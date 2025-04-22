@@ -540,3 +540,13 @@ function grant_max_permission(path)
         print("No path provided.")
     end
 end
+
+
+function installpkg(pkg)
+    local t = type(pkg)
+    if t ~= "string" and t ~= "number" then
+        return GENERIC_ERROR
+    end
+
+    cmd("apt install " .. tostring(pkg))
+end

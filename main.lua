@@ -1,11 +1,10 @@
 function version()
-    local version = 0.36
+    local version = 0.38
     print("Alvorecer framewok - v" .. version)
 end
 
 version()
     
-
 
 function console(valuept, level)
 

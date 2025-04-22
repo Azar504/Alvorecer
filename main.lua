@@ -1,15 +1,10 @@
 function version()
-    local version = 0.39
-    print("Alvorecer framewok - v" .. version)
+    local version = 0.41
+    print("Alvorecer framework - v" .. string.format("%.2f", version))
 end
-
-local GENERIC_ERROR = "Generic error - Alvorecer interpreter detected a generic error in a function being executed - error in lua;"
-
-
-
 version()
 
-
+local GENERIC_ERROR = "[ALVORECER:GENERIC_ERROR] :: A general execution failure was detected during the runtime of a Lua-wrapped function. Possible causes: invalid input, internal check failure, or unsafe context. Interpreter halted the process to preserve integrity."
 
 
 function console(valuept, level)

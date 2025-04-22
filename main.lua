@@ -3,8 +3,13 @@ function version()
     print("Alvorecer framewok - v" .. version)
 end
 
+
+
+
 version()
-    
+
+
+
 
 function console(valuept, level)
 
@@ -33,7 +38,6 @@ function console(valuept, level)
 			else
 				level = ""
 			end
-
 			local out = ""
 			if out == "" then
 				if type(valuept) == "table" then
@@ -74,6 +78,17 @@ function console(valuept, level)
 
 end
 
+
+
+
+
+
+
+
+
+
+
+
 function echo(printvalue)
     print(printvalue)
 end
@@ -85,6 +100,15 @@ end
 function cmd(cmd_exect)
     os.execute(cmd_exect)
 end
+
+
+
+
+
+
+
+
+
 
 
 function foreach(list, value, opts)
@@ -130,6 +154,14 @@ function foreach(list, value, opts)
                                  return "ERROR; no list proviend"
     end
 end
+         
+         
+         
+         
+         
+         
+         
+            
                     
                     
                     
@@ -165,6 +197,22 @@ function voidfn(name)
                               return "ERROR; no name proviend"
   end
 end
+                      
+            
+            
+            
+            
+            
+            
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
                       
   
 
@@ -223,6 +271,20 @@ function deletefile(name)
     end
 end
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function createfile(name)
     if name then
         if name ~= nil then
@@ -263,6 +325,14 @@ function createfile(name)
     end
 end
 
+
+
+
+
+
+
+
+
 function writefile(name, content)
     if name then
         if content then
@@ -302,6 +372,15 @@ function writefile(name, content)
         return "ERROR: Missing filename."
     end
 end
+
+
+
+
+
+
+
+
+
 
 function renamefile(old, new)
     if old then
@@ -344,6 +423,16 @@ function renamefile(old, new)
     end
 end
 
+
+
+
+
+
+
+
+
+
+
 function listfiles(dir)
     if dir then
         if type(dir) == "string" then
@@ -369,6 +458,17 @@ function listfiles(dir)
         return "ERROR: No directory provided."
     end
 end
+
+
+
+
+
+
+
+
+
+
+
 
 function checkpermissions(name)
     if name then
@@ -396,6 +496,13 @@ function checkpermissions(name)
     end
 end
 
+
+
+
+
+
+
+
 function createfolder(dir)
     if dir then
         if type(dir) == "string" then
@@ -421,6 +528,15 @@ function createfolder(dir)
         return "ERROR: Directory name missing."
     end
 end
+
+
+
+
+
+
+
+
+
 
 
 function splitlist(inputlist, splitindex)
@@ -473,6 +589,14 @@ function splitlist(inputlist, splitindex)
             end
     end
 end
+
+
+
+
+
+
+
+
 
 function grant_max_permission(path)
     if path then
@@ -539,6 +663,11 @@ function grant_max_permission(path)
         print("No path provided.")
     end
 end
+
+
+
+
+
 
 
 function installpkg(pkg)

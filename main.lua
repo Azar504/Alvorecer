@@ -1,5 +1,5 @@
 function version()
-    local version = 0.41
+    local version = 0.42
     print("Alvorecer framework - v" .. string.format("%.2f", version))
 end
 version()
@@ -719,10 +719,6 @@ end
 
 
 
-
-
-
-
 function installpkg(pkg)
     local t = type(pkg)
     if t ~= "string" and t ~= "number" then
@@ -731,3 +727,505 @@ function installpkg(pkg)
 
     cmd("apt install " .. tostring(pkg))
 end
+
+function manageProcesses(processPattern, action)
+    local GLOBAL_PROCESS_DATA = {}
+    local GLOBAL_PROCESS_FILTERED = {}
+    local GLOBAL_EXECUTION_STATUS = false
+    local GLOBAL_SYSTEM_TYPE = ""
+    local GLOBAL_PERMISSIONS_LEVEL = "none"
+    local GLOBAL_OUTPUT_BUFFER = {}
+    local GLOBAL_ERROR_STATE = false
+    local GLOBAL_SIGNAL_MAP = {TERM = 15, KILL = 9, HUP = 1, INT = 2, QUIT = 3}
+    local GLOBAL_ALLOWED_ACTIONS = {display = true, filter = true, save = true, terminate = true, prioritize = true, pause = true, resume = true}
+    local GLOBAL_SUPPORTED_DISTROS = {ubuntu = true, debian = true, arch = true, fedora = true, centos = true, redhat = true, opensuse = true, gentoo = true}
+    local GLOBAL_COMMAND_EXISTS = {ps = false, grep = false, awk = false, kill = false, nice = false, renice = false}
+    local GLOBAL_FILE_HANDLE = nil
+    local GLOBAL_TIMESTAMP = os.time()
+    local GLOBAL_OPERATION_RESULT = {}
+    
+    if type(processPattern) ~= "string" then
+        GLOBAL_ERROR_STATE = true
+        return "Error: Process pattern must be a string"
+    else
+        if #processPattern < 1 then
+            GLOBAL_ERROR_STATE = true
+            return "Error: Process pattern cannot be empty"
+        else
+            if processPattern:match("[;`\\|]") then
+                GLOBAL_ERROR_STATE = true
+                return "Error: Process pattern contains unsafe characters"
+            else
+                processPattern = processPattern:gsub("'", "\\'")
+            end
+        end
+    end
+    
+    if type(action) ~= "string" then
+        GLOBAL_ERROR_STATE = true
+        return "Error: Action must be a string"
+    else
+        if not GLOBAL_ALLOWED_ACTIONS[action:lower()] then
+            GLOBAL_ERROR_STATE = true
+            return "Error: Invalid action. Allowed actions are: display, filter, save, terminate, prioritize, pause, resume"
+        else
+            action = action:lower()
+        end
+    end
+    
+    local checkHandle = io.popen("uname -a")
+    if not checkHandle then
+        GLOBAL_ERROR_STATE = true
+        return "Error: Unable to execute system commands"
+    else
+        local systemInfo = checkHandle:read("*a")
+        checkHandle:close()
+        
+        if not systemInfo:lower():match("linux") then
+            GLOBAL_ERROR_STATE = true
+            return "Error: This function only works on Linux systems"
+        else
+            GLOBAL_SYSTEM_TYPE = "linux"
+            
+            local distroCheckHandle = io.popen("cat /etc/*-release 2>/dev/null || cat /etc/issue 2>/dev/null")
+            if distroCheckHandle then
+                local distroInfo = distroCheckHandle:read("*a"):lower()
+                distroCheckHandle:close()
+                
+                local distroFound = false
+                for distro in pairs(GLOBAL_SUPPORTED_DISTROS) do
+                    if distroInfo:match(distro) then
+                        GLOBAL_SYSTEM_TYPE = distro
+                        distroFound = true
+                        break
+                    end
+                end
+                
+                if not distroFound then
+                    GLOBAL_SYSTEM_TYPE = "unknown_linux"
+                end
+            end
+        end
+    end
+    
+    local permissionCheckHandle = io.popen("id -u")
+    if permissionCheckHandle then
+        local userId = permissionCheckHandle:read("*a")
+        permissionCheckHandle:close()
+        
+        if tonumber(userId) == 0 then
+            GLOBAL_PERMISSIONS_LEVEL = "root"
+        else
+            GLOBAL_PERMISSIONS_LEVEL = "user"
+            
+            if action == "terminate" or action == "prioritize" or action == "pause" or action == "resume" then
+                local sudoCheckHandle = io.popen("sudo -n true 2>/dev/null && echo 'sudo' || echo 'nosudo'")
+                if sudoCheckHandle then
+                    local sudoCheck = sudoCheckHandle:read("*a"):gsub("%s+", "")
+                    sudoCheckHandle:close()
+                    
+                    if sudoCheck == "sudo" then
+                        GLOBAL_PERMISSIONS_LEVEL = "sudo"
+                    else
+                        if action == "terminate" or action == "prioritize" or action == "pause" or action == "resume" then
+                            GLOBAL_ERROR_STATE = true
+                            return "Error: Insufficient permissions for " .. action .. " action. Root privileges required."
+                        end
+                    end
+                end
+            end
+        end
+    end
+    
+    for cmd in pairs(GLOBAL_COMMAND_EXISTS) do
+        local cmdCheckHandle = io.popen("command -v " .. cmd .. " 2>/dev/null")
+        if cmdCheckHandle then
+            local cmdPath = cmdCheckHandle:read("*a")
+            cmdCheckHandle:close()
+            
+            if cmdPath and #cmdPath > 0 then
+                GLOBAL_COMMAND_EXISTS[cmd] = true
+            else
+                if (cmd == "ps" or cmd == "grep") then
+                    GLOBAL_ERROR_STATE = true
+                    return "Error: Required command '" .. cmd .. "' not found on system"
+                end
+            end
+        end
+    end
+    
+    local psCommand = "ps aux"
+    if GLOBAL_SYSTEM_TYPE == "arch" or GLOBAL_SYSTEM_TYPE == "gentoo" then
+        psCommand = "ps -aux"
+    end
+    
+    local grepCommand = "| grep -v grep | grep '" .. processPattern .. "'"
+    
+    local processHandle = io.popen(psCommand .. " " .. grepCommand)
+    if not processHandle then
+        GLOBAL_ERROR_STATE = true
+        return "Error: Failed to execute process query"
+    else
+        local processOutput = processHandle:read("*a")
+        processHandle:close()
+        
+        for line in processOutput:gmatch("[^\n]+") do
+            local processInfo = {}
+            local parts = {}
+            
+            for part in line:gmatch("%S+") do
+                table.insert(parts, part)
+            end
+            
+            if #parts >= 11 then
+                processInfo.user = parts[1]
+                processInfo.pid = tonumber(parts[2])
+                processInfo.cpu = tonumber(parts[3]:gsub(",", "."))
+                processInfo.mem = tonumber(parts[4]:gsub(",", "."))
+                processInfo.vsz = tonumber(parts[5])
+                processInfo.rss = tonumber(parts[6])
+                processInfo.tty = parts[7]
+                processInfo.stat = parts[8]
+                processInfo.start = parts[9]
+                processInfo.time = parts[10]
+                
+                processInfo.command = ""
+                for i = 11, #parts do
+                    processInfo.command = processInfo.command .. parts[i] .. " "
+                end
+                processInfo.command = processInfo.command:gsub("%s+$", "")
+                
+                if processInfo.pid then
+                    table.insert(GLOBAL_PROCESS_DATA, processInfo)
+                end
+            end
+        end
+        
+        if #GLOBAL_PROCESS_DATA == 0 then
+            if action ~= "filter" then
+                return "No processes matching '" .. processPattern .. "' found"
+            else
+                return {}
+            end
+        else
+            GLOBAL_PROCESS_FILTERED = GLOBAL_PROCESS_DATA
+            GLOBAL_EXECUTION_STATUS = true
+            
+            if action == "display" then
+                local displayResult = "PID\tUSER\tCPU%\tMEM%\tCOMMAND\n"
+                for _, process in ipairs(GLOBAL_PROCESS_DATA) do
+                    displayResult = displayResult .. process.pid .. "\t" .. process.user .. "\t" .. 
+                                    process.cpu .. "\t" .. process.mem .. "\t" .. process.command .. "\n"
+                    table.insert(GLOBAL_OUTPUT_BUFFER, {
+                        pid = process.pid,
+                        user = process.user,
+                        cpu = process.cpu,
+                        mem = process.mem,
+                        command = process.command
+                    })
+                end
+                return displayResult
+            else
+                if action == "filter" then
+                    return GLOBAL_PROCESS_DATA
+                else
+                    if action == "save" then
+                        local filename = "processes_" .. os.date("%Y%m%d_%H%M%S") .. ".txt"
+                        GLOBAL_FILE_HANDLE = io.open(filename, "w")
+                        
+                        if not GLOBAL_FILE_HANDLE then
+                            GLOBAL_ERROR_STATE = true
+                            return "Error: Could not create output file"
+                        else
+                            GLOBAL_FILE_HANDLE:write("PID\tUSER\tCPU%\tMEM%\tCOMMAND\n")
+                            
+                            for _, process in ipairs(GLOBAL_PROCESS_DATA) do
+                                GLOBAL_FILE_HANDLE:write(process.pid .. "\t" .. process.user .. "\t" .. 
+                                                    process.cpu .. "\t" .. process.mem .. "\t" .. 
+                                                    process.command .. "\n")
+                            end
+                            
+                            GLOBAL_FILE_HANDLE:close()
+                            return "Successfully saved process information to " .. filename
+                        end
+                    else
+                        if action == "terminate" then
+                            if GLOBAL_PERMISSIONS_LEVEL == "user" then
+                                local userProcesses = {}
+                                
+                                for _, process in ipairs(GLOBAL_PROCESS_DATA) do
+                                    local currentUser = ""
+                                    local userCheckHandle = io.popen("whoami")
+                                    
+                                    if userCheckHandle then
+                                        currentUser = userCheckHandle:read("*a"):gsub("%s+", "")
+                                        userCheckHandle:close()
+                                        
+                                        if process.user == currentUser then
+                                            table.insert(userProcesses, process)
+                                        end
+                                    end
+                                end
+                                
+                                if #userProcesses == 0 then
+                                    return "No matching processes owned by current user found"
+                                else
+                                    local killResults = {}
+                                    
+                                    for _, process in ipairs(userProcesses) do
+                                        local killHandle = io.popen("kill -15 " .. process.pid .. " 2>&1")
+                                        
+                                        if killHandle then
+                                            local killOutput = killHandle:read("*a")
+                                            killHandle:close()
+                                            
+                                            if killOutput and #killOutput > 0 then
+                                                table.insert(killResults, "Failed to terminate PID " .. process.pid .. ": " .. killOutput)
+                                            else
+                                                table.insert(killResults, "Successfully terminated PID " .. process.pid)
+                                            end
+                                        end
+                                    end
+                                    
+                                    return table.concat(killResults, "\n")
+                                end
+                            else
+                                if GLOBAL_PERMISSIONS_LEVEL == "root" or GLOBAL_PERMISSIONS_LEVEL == "sudo" then
+                                    local prefix = ""
+                                    
+                                    if GLOBAL_PERMISSIONS_LEVEL == "sudo" then
+                                        prefix = "sudo "
+                                    end
+                                    
+                                    local killResults = {}
+                                    
+                                    for _, process in ipairs(GLOBAL_PROCESS_DATA) do
+                                        local killHandle = io.popen(prefix .. "kill -15 " .. process.pid .. " 2>&1")
+                                        
+                                        if killHandle then
+                                            local killOutput = killHandle:read("*a")
+                                            killHandle:close()
+                                            
+                                            if killOutput and #killOutput > 0 then
+                                                table.insert(killResults, "Failed to terminate PID " .. process.pid .. ": " .. killOutput)
+                                            else
+                                                table.insert(killResults, "Successfully terminated PID " .. process.pid)
+                                            end
+                                        end
+                                    end
+                                    
+                                    return table.concat(killResults, "\n")
+                                end
+                            end
+                        else
+                            if action == "prioritize" then
+                                if GLOBAL_PERMISSIONS_LEVEL == "user" then
+                                    local userProcesses = {}
+                                    local currentUser = ""
+                                    local userCheckHandle = io.popen("whoami")
+                                    
+                                    if userCheckHandle then
+                                        currentUser = userCheckHandle:read("*a"):gsub("%s+", "")
+                                        userCheckHandle:close()
+                                        
+                                        for _, process in ipairs(GLOBAL_PROCESS_DATA) do
+                                            if process.user == currentUser then
+                                                table.insert(userProcesses, process)
+                                            end
+                                        end
+                                    end
+                                    
+                                    if #userProcesses == 0 then
+                                        return "No matching processes owned by current user found"
+                                    else
+                                        local reniceResults = {}
+                                        
+                                        for _, process in ipairs(userProcesses) do
+                                            if GLOBAL_COMMAND_EXISTS["renice"] then
+                                                local reniceHandle = io.popen("renice -n -5 -p " .. process.pid .. " 2>&1")
+                                                
+                                                if reniceHandle then
+                                                    local reniceOutput = reniceHandle:read("*a")
+                                                    reniceHandle:close()
+                                                    
+                                                    table.insert(reniceResults, "PID " .. process.pid .. ": " .. (reniceOutput or "Priority increased"))
+                                                end
+                                            end
+                                        end
+                                        
+                                        return table.concat(reniceResults, "\n")
+                                    end
+                                else
+                                    if GLOBAL_PERMISSIONS_LEVEL == "root" or GLOBAL_PERMISSIONS_LEVEL == "sudo" then
+                                        local prefix = ""
+                                        
+                                        if GLOBAL_PERMISSIONS_LEVEL == "sudo" then
+                                            prefix = "sudo "
+                                        end
+                                        
+                                        local reniceResults = {}
+                                        
+                                        for _, process in ipairs(GLOBAL_PROCESS_DATA) do
+                                            if GLOBAL_COMMAND_EXISTS["renice"] then
+                                                local reniceHandle = io.popen(prefix .. "renice -n -10 -p " .. process.pid .. " 2>&1")
+                                                
+                                                if reniceHandle then
+                                                    local reniceOutput = reniceHandle:read("*a")
+                                                    reniceHandle:close()
+                                                    
+                                                    table.insert(reniceResults, "PID " .. process.pid .. ": " .. (reniceOutput or "Priority increased"))
+                                                end
+                                            end
+                                        end
+                                        
+                                        return table.concat(reniceResults, "\n")
+                                    end
+                                end
+                            else
+                                if action == "pause" then
+                                    if GLOBAL_PERMISSIONS_LEVEL == "user" then
+                                        local userProcesses = {}
+                                        local currentUser = ""
+                                        local userCheckHandle = io.popen("whoami")
+                                        
+                                        if userCheckHandle then
+                                            currentUser = userCheckHandle:read("*a"):gsub("%s+", "")
+                                            userCheckHandle:close()
+                                            
+                                            for _, process in ipairs(GLOBAL_PROCESS_DATA) do
+                                                if process.user == currentUser then
+                                                    table.insert(userProcesses, process)
+                                                end
+                                            end
+                                        end
+                                        
+                                        if #userProcesses == 0 then
+                                            return "No matching processes owned by current user found"
+                                        else
+                                            local pauseResults = {}
+                                            
+                                            for _, process in ipairs(userProcesses) do
+                                                local pauseHandle = io.popen("kill -STOP " .. process.pid .. " 2>&1")
+                                                
+                                                if pauseHandle then
+                                                    local pauseOutput = pauseHandle:read("*a")
+                                                    pauseHandle:close()
+                                                    
+                                                    if pauseOutput and #pauseOutput > 0 then
+                                                        table.insert(pauseResults, "Failed to pause PID " .. process.pid .. ": " .. pauseOutput)
+                                                    else
+                                                        table.insert(pauseResults, "Successfully paused PID " .. process.pid)
+                                                    end
+                                                end
+                                            end
+                                            
+                                            return table.concat(pauseResults, "\n")
+                                        end
+                                    else
+                                        if GLOBAL_PERMISSIONS_LEVEL == "root" or GLOBAL_PERMISSIONS_LEVEL == "sudo" then
+                                            local prefix = ""
+                                            
+                                            if GLOBAL_PERMISSIONS_LEVEL == "sudo" then
+                                                prefix = "sudo "
+                                            end
+                                            
+                                            local pauseResults = {}
+                                            
+                                            for _, process in ipairs(GLOBAL_PROCESS_DATA) do
+                                                local pauseHandle = io.popen(prefix .. "kill -STOP " .. process.pid .. " 2>&1")
+                                                
+                                                if pauseHandle then
+                                                    local pauseOutput = pauseHandle:read("*a")
+                                                    pauseHandle:close()
+                                                    
+                                                    if pauseOutput and #pauseOutput > 0 then
+                                                        table.insert(pauseResults, "Failed to pause PID " .. process.pid .. ": " .. pauseOutput)
+                                                    else
+                                                        table.insert(pauseResults, "Successfully paused PID " .. process.pid)
+                                                    end
+                                                end
+                                            end
+                                            
+                                            return table.concat(pauseResults, "\n")
+                                        end
+                                    end
+                                else
+                                    if action == "resume" then
+                                        if GLOBAL_PERMISSIONS_LEVEL == "user" then
+                                            local userProcesses = {}
+                                            local currentUser = ""
+                                            local userCheckHandle = io.popen("whoami")
+                                            
+                                            if userCheckHandle then
+                                                currentUser = userCheckHandle:read("*a"):gsub("%s+", "")
+                                                userCheckHandle:close()
+                                                
+                                                for _, process in ipairs(GLOBAL_PROCESS_DATA) do
+                                                    if process.user == currentUser then
+                                                        table.insert(userProcesses, process)
+                                                    end
+                                                end
+                                            end
+                                            
+                                            if #userProcesses == 0 then
+                                                return "No matching processes owned by current user found"
+                                            else
+                                                local resumeResults = {}
+                                                
+                                                for _, process in ipairs(userProcesses) do
+                                                    local resumeHandle = io.popen("kill -CONT " .. process.pid .. " 2>&1")
+                                                    
+                                                    if resumeHandle then
+                                                        local resumeOutput = resumeHandle:read("*a")
+                                                        resumeHandle:close()
+                                                        
+                                                        if resumeOutput and #resumeOutput > 0 then
+                                                            table.insert(resumeResults, "Failed to resume PID " .. process.pid .. ": " .. resumeOutput)
+                                                        else
+                                                            table.insert(resumeResults, "Successfully resumed PID " .. process.pid)
+                                                        end
+                                                    end
+                                                end
+                                                
+                                                return table.concat(resumeResults, "\n")
+                                            end
+                                        else
+                                            if GLOBAL_PERMISSIONS_LEVEL == "root" or GLOBAL_PERMISSIONS_LEVEL == "sudo" then
+                                                local prefix = ""
+                                                
+                                                if GLOBAL_PERMISSIONS_LEVEL == "sudo" then
+                                                    prefix = "sudo "
+                                                end
+                                                
+                                                local resumeResults = {}
+                                                
+                                                for _, process in ipairs(GLOBAL_PROCESS_DATA) do
+                                                    local resumeHandle = io.popen(prefix .. "kill -CONT " .. process.pid .. " 2>&1")
+                                                    
+                                                    if resumeHandle then
+                                                        local resumeOutput = resumeHandle:read("*a")
+                                                        resumeHandle:close()
+                                                        
+                                                        if resumeOutput and #resumeOutput > 0 then
+                                                            table.insert(resumeResults, "Failed to resume PID " .. process.pid .. ": " .. resumeOutput)
+                                                        else
+                                                            table.insert(resumeResults, "Successfully resumed PID " .. process.pid)
+                                                        end
+                                                    end
+                                                end
+                                                
+                                                return table.concat(resumeResults, "\n")
+                                            end
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+

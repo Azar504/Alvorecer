@@ -1227,5 +1227,3 @@ function manageProcesses(processPattern, action)
         end
     end
 end
-
-

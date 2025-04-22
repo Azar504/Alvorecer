@@ -1,8 +1,9 @@
 function version()
-    local version = 0.38
+    local version = 0.39
     print("Alvorecer framewok - v" .. version)
 end
 
+local GENERIC_ERROR = "Generic error - Alvorecer interpreter detected a generic error in a function being executed - error in lua;"
 
 
 
@@ -96,6 +97,63 @@ end
 function global(table, name, value)
     table[name] = value
 end
+
+
+local tokenglobal = {}
+
+
+
+
+
+function globaltoken(name, value)
+    local CriticalErrorCoppy = "Attempt to overwrite variable detected // critical error //"
+
+    if type(name) == "string" then
+        if name:match("^[%a_][%w_]*$") then
+            if _G[name] == nil then
+                rawset(_G, name, value)
+                if type(name) == "string" then
+                    if not tokenglobal then
+                        tokenglobal = {}
+                        if tokenglobal then
+                            tokenglobal[name] = true
+                            if tokenglobal[name] == true then
+                                if _G then
+                                    setmetatable(_G, {
+                                        __newindex = function(_, key, value)
+                                            if tokenglobal then
+                                                if tokenglobal[key] then
+                                                    error(CriticalErrorCoppy)
+                                                else
+                                                    if _G then
+                                                        rawset(_G, key, value)
+                                                    end
+                                                end
+                                            end
+                                        end
+                                    })
+                                end
+                            end
+                        end
+                    end
+                end
+            else
+                return "Critical error: global token already exists"
+            end
+        else
+            return GENERIC_ERROR
+        end
+    else
+        return "token name must be of type == string"
+    end
+end
+
+    
+
+
+
+
+
 
 function cmd(cmd_exect)
     os.execute(cmd_exect)

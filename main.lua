@@ -1,5 +1,5 @@
 function version()
-    local version = 0.42
+    local version = "0.43.pManager"
     print("Alvorecer framework - v" .. string.format("%.2f", version))
 end
 version()

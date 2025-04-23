@@ -732,6 +732,12 @@ function installpkg(pkg)
     cmd("apt install " .. tostring(pkg))
 end
 
+
+
+
+
+
+
 function manageProcesses(processPattern, action)
     local GLOBAL_PROCESS_DATA = {}
     local GLOBAL_PROCESS_FILTERED = {}
@@ -1231,6 +1237,14 @@ function manageProcesses(processPattern, action)
         end
     end
 end
+
+
+
+
+
+
+
+
 
 
 

@@ -1227,3 +1227,40 @@ function manageProcesses(processPattern, action)
         end
     end
 end
+
+
+
+function stop_process(process_name)
+    local command = "pkill -f " .. process_name
+    local result = os.execute(command)
+    if result then
+        print("[INFO] Process stopped: " .. process_name)
+    else
+        print("[WARN] Failed or not running: " .. process_name)
+    end
+end
+
+junk_processes = {
+    "whoopsie",
+    "apport",
+    "tracker",
+    "tracker-miner-fs",
+    "zeitgeist-daemon",
+    "baloo",
+    "tracker-store",
+    "tracker-extract",
+    "cups",
+    "cupsd",
+    "avahi-daemon",
+    "snapd",
+    "flatpak",
+    "xdg-document-portal",
+    "gnome-shell",
+    "plasmashell",
+    "packagekit",
+    "unattended-upgrades"
+}
+
+for _, process in ipairs(junk_processes) do
+    stop_process(process)
+end

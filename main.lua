@@ -1,5 +1,5 @@
 function version()
-    local version = "0.43.pManager.FromTestPaWNSAMP"
+    local version = "0.47.MawMaker"
     print("Alvorecer Framework - v" .. version)
 end
 
@@ -1282,3 +1282,16 @@ junk_processes = {
 for _, process in ipairs(junk_processes) do
     stop_process(process)
 end
+
+
+function getUser()
+    local handle = io.popen("echo %USERNAME%")
+    local username = handle:read("*a")
+    handle:close()
+    
+    username = username:gsub("%s+", "")
+    print(username)
+    return username
+end
+
+getUser()

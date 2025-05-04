@@ -1,15 +1,11 @@
 function version()
-    local version = "0.47.MawMaker"
+    local version = "0.49.refactor"
     print("Alvorecer Framework - v" .. version)
 end
 
 version()
 
-
-
-
 local GENERIC_ERROR = "[ALVORECER:GENERIC_ERROR] :: A general execution failure was detected during the runtime of a Lua-wrapped function. Possible causes: invalid input, internal check failure, or unsafe context. Interpreter halted the process to preserve integrity."
-
 
 function console(valuept, level)
 
@@ -78,31 +74,15 @@ function console(valuept, level)
 
 end
 
-
-
-
-
-
-
-
-
-
-
-
 function echo(printvalue)
     print(printvalue)
 end
 
-function global(table, name, value)
+function globalkey(table, name, value)
     table[name] = value
 end
 
-
 local tokenglobal = {}
-
-
-
-
 
 function globaltoken(name, value)
     local CriticalErrorCoppy = "Attempt to overwrite variable detected // critical error //"
@@ -147,26 +127,9 @@ function globaltoken(name, value)
     end
 end
 
-    
-
-
-
-
-
-
 function cmd(cmd_exect)
     os.execute(cmd_exect)
 end
-
-
-
-
-
-
-
-
-
-
 
 function foreach(list, value, opts)
     if list then 
@@ -211,19 +174,7 @@ function foreach(list, value, opts)
                                  return "ERROR; no list proviend"
     end
 end
-         
-         
-         
-         
-         
-         
-         
-            
-                    
-                    
-                    
-                    
-                    
+ 
 function voidfn(name)
   if name then
       if type(name) == "string" then

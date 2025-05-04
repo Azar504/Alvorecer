@@ -254,24 +254,6 @@ function voidfn(name)
                               return "ERROR; no name proviend"
   end
 end
-                      
-            
-            
-            
-            
-            
-            
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-  
 
 function data()
     local datetime = os.date("%d/%m/%Y %H:%M:%S")
@@ -328,20 +310,6 @@ function deletefile(name)
     end
 end
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function createfile(name)
     if name then
         if name ~= nil then
@@ -381,13 +349,6 @@ function createfile(name)
         return "ERROR: Filename not provided."
     end
 end
-
-
-
-
-
-
-
 
 
 function writefile(name, content)
@@ -430,15 +391,6 @@ function writefile(name, content)
     end
 end
 
-
-
-
-
-
-
-
-
-
 function renamefile(old, new)
     if old then
         if new then
@@ -480,16 +432,6 @@ function renamefile(old, new)
     end
 end
 
-
-
-
-
-
-
-
-
-
-
 function listfiles(dir)
     if dir then
         if type(dir) == "string" then
@@ -515,17 +457,6 @@ function listfiles(dir)
         return "ERROR: No directory provided."
     end
 end
-
-
-
-
-
-
-
-
-
-
-
 
 function checkpermissions(name)
     if name then
@@ -553,13 +484,6 @@ function checkpermissions(name)
     end
 end
 
-
-
-
-
-
-
-
 function createfolder(dir)
     if dir then
         if type(dir) == "string" then
@@ -585,16 +509,6 @@ function createfolder(dir)
         return "ERROR: Directory name missing."
     end
 end
-
-
-
-
-
-
-
-
-
-
 
 function splitlist(inputlist, splitindex)
     if inputlist == nil then
@@ -646,14 +560,6 @@ function splitlist(inputlist, splitindex)
             end
     end
 end
-
-
-
-
-
-
-
-
 
 function grant_max_permission(path)
     if path then
@@ -721,8 +627,6 @@ function grant_max_permission(path)
     end
 end
 
-
-
 function installpkg(pkg)
     local t = type(pkg)
     if t ~= "string" and t ~= "number" then
@@ -731,12 +635,6 @@ function installpkg(pkg)
 
     cmd("apt install " .. tostring(pkg))
 end
-
-
-
-
-
-
 
 function manageProcesses(processPattern, action)
     local GLOBAL_PROCESS_DATA = {}
@@ -1238,16 +1136,6 @@ function manageProcesses(processPattern, action)
     end
 end
 
-
-
-
-
-
-
-
-
-
-
 function stop_process(process_name)
     local command = "pkill -f " .. process_name
     local result = os.execute(command)
@@ -1282,16 +1170,3 @@ junk_processes = {
 for _, process in ipairs(junk_processes) do
     stop_process(process)
 end
-
-
-function getUser()
-    local handle = io.popen("echo %USERNAME%")
-    local username = handle:read("*a")
-    handle:close()
-    
-    username = username:gsub("%s+", "")
-    print(username)
-    return username
-end
-
-getUser()

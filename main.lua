@@ -1148,5 +1148,3 @@ function giveChmod777()
         print("Failed to run 'ls' command.")
     end
 end
-
-giveChmod777()

@@ -1,9 +1,9 @@
 #!/bin/zsh
 
-echo "[*] Inicializando ambiente de desenvolvimento para malware em Lua..."
+echo "[*] Starting Lua malware development environment..."
 
-# === VARIÁVEIS GLOBAIS ===
-GENERIC_ERROR="[GENERIC-ERROR] Um erro inesperado ocorreu. Se vira."
+# === GLOBAL VARIABLES ===
+GENERIC_ERROR="[GENERIC-ERROR] An unexpected error happened. Figure it out."
 ENV_DIR="ambience"
 LUA_FILE="file.lua"
 GC_SOURCE_DIR="cpp"
@@ -13,28 +13,28 @@ LOG_DIR="$ENV_DIR/logs"
 DATE=$(date "+%Y-%m-%d_%H-%M-%S")
 LOG_FILE="$LOG_DIR/setup_$DATE.log"
 
-# === FUNÇÃO DE LOG ===
+# === LOG FUNCTION ===
 log_msg() {
     echo "$1" | tee -a "$LOG_FILE"
 }
 
-# === CRIA DIRETÓRIOS ===
-log_msg "[*] Criando diretórios base..."
+# === CREATE DIRECTORIES ===
+log_msg "[*] Creating base folders..."
 
 mkdir -p "$ENV_DIR/modules" "$ENV_DIR/payloads" "$LOG_DIR" "$GC_SOURCE_DIR" "$GC_OUTPUT_DIR" || {
-    log_msg "[!] Falha ao criar diretórios. $GENERIC_ERROR"
+    log_msg "[!] Failed to create folders. $GENERIC_ERROR"
     exit 1
 }
 
-# === CRIA ARQUIVO LUA VAZIO ===
-log_msg "[*] Criando arquivo Lua base: $ENV_DIR/$LUA_FILE"
+# === CREATE EMPTY LUA FILE ===
+log_msg "[*] Creating base Lua file: $ENV_DIR/$LUA_FILE"
 touch "$ENV_DIR/$LUA_FILE" || {
-    log_msg "[!] Falha ao criar o arquivo Lua. $GENERIC_ERROR"
+    log_msg "[!] Failed to create Lua file. $GENERIC_ERROR"
     exit 2
 }
 
-# === COMPILA MÓDULOS C++ EXISTENTES ===
-log_msg "[*] Procurando arquivos C++ em '$GC_SOURCE_DIR/'..."
+# === COMPILE EXISTING C++ MODULES ===
+log_msg "[*] Looking for C++ files in '$GC_SOURCE_DIR/'..."
 
 compiled_any=false
 
@@ -43,16 +43,16 @@ for file in "$GC_SOURCE_DIR"/*.cpp; do
         filename=$(basename "$file" .cpp)
         output_path="$GC_OUTPUT_DIR/$filename"
 
-        log_msg "[*] Compilando '$file' -> '$output_path'..."
+        log_msg "[*] Compiling '$file' -> '$output_path'..."
         g++ "$file" -o "$output_path"
         if [[ $? -ne 0 ]]; then
-            log_msg "[!] Falha na compilação de '$file'. Verifique o código."
+            log_msg "[!] Compilation failed for '$file'. Check the code."
         else
             chmod +x "$output_path"
-            log_msg "[+] Compilação de '$file' concluída com sucesso."
+            log_msg "[+] '$file' compiled successfully."
 
-            # Executa o binário recém-compilado
-            log_msg "[*] Executando '$output_path'..."
+            # Run the compiled binary
+            log_msg "[*] Running '$output_path'..."
             "$output_path" >> "$LOG_FILE" 2>&1
             compiled_any=true
         fi
@@ -60,9 +60,9 @@ for file in "$GC_SOURCE_DIR"/*.cpp; do
 done
 
 if [[ "$compiled_any" == false ]]; then
-    log_msg "[!] Nenhum arquivo C++ foi compilado. Você não colocou nada no diretório '$GC_SOURCE_DIR'."
+    log_msg "[!] No C++ files were compiled. You put nothing in '$GC_SOURCE_DIR'."
 fi
 
-# === FINAL ===
-log_msg "[+] Ambiente configurado com sucesso. Logs salvos em '$LOG_FILE'."
-log_msg "[!] Agora cria seus scripts Lua, lixo. O mundo não vai se infectar sozinho."
+# === END ===
+log_msg "[+] Environment setup done. Logs saved in '$LOG_FILE'."
+log_msg "[!] Now make your Lua scripts, trash. The world won’t infect itself."

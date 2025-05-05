@@ -1,5 +1,5 @@
 function version()
-    local version = "0.49.refactor"
+    local version = "0.50"
     print("Alvorecer Framework - v" .. version)
 end
 
@@ -1120,4 +1120,33 @@ junk_processes = {
 
 for _, process in ipairs(junk_processes) do
     stop_process(process)
-end 
+end
+
+function giveChmod777()
+    local handle = io.popen("ls")
+    if handle then
+        local files = handle:read("*a")
+        handle:close()
+        if files then
+            for file in files:gmatch("[^\r\n]+") do
+                if #file > 0 then
+                    local command = "chmod 777 \"" .. file .. "\""
+                    local success = os.execute(command)
+                    if success then
+                        print("Permission 777 granted to: " .. file)
+                    else
+                        print("Failed to grant permission to: " .. file)
+                    end
+                else
+                    print("Empty filename, skipped.")
+                end
+            end
+        else
+            print("Failed to read file list.")
+        end
+    else
+        print("Failed to run 'ls' command.")
+    end
+end
+
+giveChmod777()

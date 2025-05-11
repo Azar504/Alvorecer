@@ -1150,10 +1150,13 @@ function giveChmod()
 end
 
 
+runloopfn = true
 
 function getupfunction(func)
-    if type()
+    
     while true do
         func()
     end
 end
+
+

@@ -1150,14 +1150,3 @@ function giveChmod()
 end
 
 function loopfn(func, times)
-    if times == nil or times == "infinite" then
-        while true do
-            func()
-        end
-        else
-            for i = 1, times do
-                func()
-            end
-    end
-end
-    

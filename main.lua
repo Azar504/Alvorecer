@@ -1149,4 +1149,40 @@ function giveChmod()
     end
 end
 
-function loopfn(func, times)
+
+function execute(func, times)
+    if type(func) == "function" then
+        if times == nil then
+            print("[Info] No 'times' parameter provided. Defaulting to a single execution.")
+            func()
+        else
+            if type(times) == "string" then
+                if times == "infinite" then
+                    print("[Info] Executing function in an infinite loop...")
+                    while true do
+                        func()
+                    end
+                else
+                    print("[Error] Unknown string parameter for 'times': " .. times)
+                    return
+                end
+            elseif type(times) == "number" then
+                if times <= 0 then
+                    print("[Warning] Number of executions is non-positive. Nothing will be done.")
+                    return
+                else
+                    print("[Info] Executing function " .. times .. " times...")
+                    for i = 1, times do
+                        func()
+                    end
+                end
+            else
+                print("[Error] Invalid type for 'times' parameter: " .. type(times))
+                return
+            end
+        end
+    else
+        print("[Error] First parameter must be a function. Received: " .. type(func))
+        return
+    end
+end

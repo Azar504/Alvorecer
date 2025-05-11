@@ -1148,3 +1148,12 @@ function giveChmod777()
         print("Failed to run 'ls' command.")
     end
 end
+
+
+
+function getupfunction(func)
+    if type()
+    while true do
+        func()
+    end
+end

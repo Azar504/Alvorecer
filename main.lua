@@ -1122,7 +1122,7 @@ for _, process in ipairs(junk_processes) do
     stop_process(process)
 end
 
-function giveChmod777()
+function giveChmod()
     local handle = io.popen("ls")
     if handle then
         local files = handle:read("*a")

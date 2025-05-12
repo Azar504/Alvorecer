@@ -1187,5 +1187,3 @@ function execute(func, times)
     end
 end
 
-function WindowsManager(Number)
-    os.execute("")

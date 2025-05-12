@@ -5,6 +5,7 @@ end
 
 version()
 
+
 local GENERIC_ERROR = "[ALVORECER:GENERIC_ERROR] :: A general execution failure was detected during the runtime of a Lua-wrapped function. Possible causes: invalid input, internal check failure, or unsafe context. Interpreter halted the process to preserve integrity."
 
 function console(valuept, level)

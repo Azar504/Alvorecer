@@ -1243,7 +1243,7 @@ function WindowsManager(amount, command, debug)
         return
     end
 
-    if math.floor(num) ~= num then
+   if math.floor(num) ~= num then
         print("Error: amount must be an integer.")
         return
     end

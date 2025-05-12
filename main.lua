@@ -1187,21 +1187,72 @@ function execute(func, times)
     end
 end
 
-function WindowsManager(Number, cmmd)
-    if Number == "inf" then
+
+function WindowsManager(amount, command, debug)
+    local COMMAND_ERROR = "Error: invalid or empty command."
+
+    -- Validate command
+    if command == nil then
+        print(COMMAND_ERROR .. " (command is nil)")
+        return
+    end
+
+    if type(command) ~= "string" then
+        print(COMMAND_ERROR .. " (command must be a string)")
+        return
+    end
+
+    if command == "" then
+        print(COMMAND_ERROR .. " (command is an empty string)")
+        return
+    end
+
+    -- Check for infinite execution
+    if amount == "inf" then
+        print("Entering infinite execution loop...")
         while true do
-            os.execute(comando)
+            if debug then
+                print("[DEBUG] Executing command: " .. command)
+            end
+            os.execute(command)
         end
-        else
-            local num = tonumber(Number)
-            if num == nil then
-                print(GENERIC_ERROR)
-                return
-            end
-            for i = 1, num do
-                os.execute(cmmd)
-            end
+        return
+    end
+
+    -- Validate amount as a number
+    if amount == nil then
+        print(GENERIC_ERROR .. " (amount is nil)")
+        return
+    end
+
+    if type(amount) ~= "number" and type(amount) ~= "string" then
+        print(GENERIC_ERROR .. " (amount must be a number or numeric string)")
+        return
+    end
+
+    local num = tonumber(amount)
+
+    if num == nil then
+        print(GENERIC_ERROR .. " (unable to convert amount to number)")
+        return
+    end
+
+    if num <= 0 then
+        print("Error: amount must be greater than zero.")
+        return
+    end
+
+    if math.floor(num) ~= num then
+        print("Error: amount must be an integer.")
+        return
+    end
+
+    -- Execute the command num times
+    print("Executing command " .. num .. " times...")
+    for i = 1, num do
+        if debug then
+            print("[DEBUG] Running iteration " .. i .. " -> " .. command)
+        end
+        os.execute(command)
     end
 end
-    end
-    

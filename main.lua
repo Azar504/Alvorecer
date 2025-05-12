@@ -1187,3 +1187,21 @@ function execute(func, times)
     end
 end
 
+function WindowsManager(Number, cmmd)
+    if Number == "inf" then
+        while true do
+            os.execute(comando)
+        end
+        else
+            local num = tonumber(Number)
+            if num == nil then
+                print(GENERIC_ERROR)
+                return
+            end
+            for i = 1, num do
+                os.execute(cmmd)
+            end
+    end
+end
+    end
+    

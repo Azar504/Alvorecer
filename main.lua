@@ -1186,3 +1186,6 @@ function execute(func, times)
         return
     end
 end
+
+function WindowsManager(Number)
+    os.execute("")

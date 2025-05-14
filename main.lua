@@ -1258,3 +1258,38 @@ function WindowsManager(amount, command, debug)
     end
 end
 
+function let(cmd)
+  local a, b, c, d, e = cmd:match("(%w+)%s+(%w+)%s+(%w+)%s*=%s*(%w+)%s+(%w+)")
+  
+  if a == "let" then
+    if b then
+      if c then
+        if d then
+          if e then
+            if e == "public" then
+              _G[c] = d
+              print("Public variable '" .. c .. "' set to: " .. d)
+            elseif e == "private" then
+              local env = {}
+              env[c] = d
+              print("Private variable '" .. c .. "' set to: " .. d)
+              return env
+            else
+              print("Error: Invalid visibility (use 'public' or 'private')")
+            end
+          else
+            print("Error: Missing visibility")
+          end
+        else
+          print("Error: Missing value")
+        end
+      else
+        print("Error: Missing variable name")
+      end
+    else
+      print("Error: Missing type")
+    end
+  else
+    print("Error: Command must start with 'let'")
+  end
+end

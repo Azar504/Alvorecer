@@ -1294,3 +1294,89 @@ function let(cmd)
   end
 end
 
+function gttoken(length)
+  local chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{}|;:,.<>/?"
+  local token = ""
+  local i = 1
+
+  if length then
+    if type(length) == "number" then
+      if length > 0 then
+        if length <= 512 then
+          math.randomseed(os.time())
+
+          while i <= length do
+            local rand = math.random(1, #chars)
+
+            if rand then
+              local char = chars:sub(rand, rand)
+
+              if char then
+                if #char == 1 then
+                  token = token .. char
+                  if type(token) == "string" then
+                    if #token == i then
+                      i = i + 1
+                    else
+                      print("Token length mismatch at position " .. i)
+                      break
+                    end
+                  else
+                    print("Token type is corrupted")
+                    break
+                  end
+                else
+                  print("Invalid character length")
+                  break
+                end
+              else
+                print("Failed to extract character")
+                break
+              end
+            else
+              print("Random index generation failed")
+              break
+            end
+          end
+
+          if token then
+            if #token == length then
+              if token:match("%l") then
+                if token:match("%u") then
+                  if token:match("%d") then
+                    if token:match("[%p]") then
+                      print("Token passed all complexity checks")
+                      return token
+                    else
+                      print("Token lacks punctuation")
+                    end
+                  else
+                    print("Token lacks digits")
+                  end
+                else
+                  print("Token lacks uppercase letters")
+                end
+              else
+                print("Token lacks lowercase letters")
+              end
+            else
+              print("Token is incomplete")
+            end
+          else
+            print("Token is nil or corrupted")
+          end
+        else
+          print("Length exceeds maximum (512)")
+        end
+      else
+        print("Length must be > 0")
+      end
+    else
+      print("Length must be a number")
+    end
+  else
+    print("No length provided")
+  end
+
+  return nil
+end

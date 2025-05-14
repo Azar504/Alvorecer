@@ -1257,3 +1257,4 @@ function WindowsManager(amount, command, debug)
         os.execute(command)
     end
 end
+

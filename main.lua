@@ -1383,4 +1383,11 @@ end
 
 function dataget(data)
     local result = ()
-    for 
+    for key, value in pairs(data) do
+        table.insert(result, value)
+    end
+    return result
+    else
+        return GENERIC_ERROR
+end
+dataget(GENERIC_ERROR)

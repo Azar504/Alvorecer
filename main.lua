@@ -1388,3 +1388,10 @@ function dataget(data)
     end
     return result
 end
+
+function getlevelpass(level, file)
+    local file = ""
+    local leve = ""
+    local datafilebuffer = " "
+    local getfilepasscrypt = " "
+    

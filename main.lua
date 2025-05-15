@@ -1387,7 +1387,4 @@ function dataget(data)
         table.insert(result, value)
     end
     return result
-    else
-        return GENERIC_ERROR
 end
-dataget(GENERIC_ERROR)

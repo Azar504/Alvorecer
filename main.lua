@@ -1380,3 +1380,7 @@ function gttoken(length)
 
   return nil
 end
+
+function dataget(data)
+    local result = ()
+    for 

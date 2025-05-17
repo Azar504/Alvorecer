@@ -294,3 +294,4 @@ function deepscan(target, scan_mode, precision_level, data_filter, safety_checks
         }
     }
 end
+

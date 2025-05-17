@@ -1381,6 +1381,119 @@ function gttoken(length)
   return nil
 end
 
+
+
+function dataget(data)
+    if type(data) ~= "table" then
+        return { error = true, code = 900, reason = "Root type violation." }
+    end
+
+    local result = {}
+    local meta = {
+        hash = 0,
+        entropy = 0,
+        anomalies = 0,
+        types = {},
+        depth = 0,
+        signature = "",
+        volatile = false
+    }
+
+    local function entropyScore(value)
+        if type(value) == "string" then
+            return #value * 2
+        elseif type(value) == "number" then
+            return math.abs(value) % 100
+        elseif type(value) == "table" then
+            return #value * 4
+        elseif type(value) == "boolean" then
+            return value and 10 or 5
+        else
+            return 0
+        end
+    end
+
+    local function scanKeyValue(k, v, level)
+        local ktype = type(k)
+        local vtype = type(v)
+
+        if ktype ~= "string" and ktype ~= "number" then
+            meta.anomalies = meta.anomalies + 1
+        end
+
+        if v == nil or vtype == "function" or vtype == "userdata" then
+            meta.anomalies = meta.anomalies + 1
+        end
+
+        if vtype == "table" then
+            if level >= 4 then
+                meta.volatile = true
+                return
+            end
+            for kk, vv in pairs(v) do
+                scanKeyValue(kk, vv, level + 1)
+            end
+        end
+
+        meta.entropy = meta.entropy + entropyScore(v)
+        meta.hash = meta.hash + ((ktype == "string" and #k) or k)
+        meta.types[vtype] = (meta.types[vtype] or 0) + 1
+    end
+
+    for k, v in pairs(data) do
+        scanKeyValue(k, v, 1)
+        table.insert(result, v)
+    end
+
+    local uid = tostring(os.clock() * meta.entropy + meta.hash)
+    meta.signature = string.sub(uid, 1, 12)
+
+    if meta.anomalies > 3 then
+        return {
+            error = true,
+            code = 901,
+            threat = "high",
+            meta = meta,
+            message = "Data structure exceeds anomaly threshold."
+        }
+    end
+
+    if meta.volatile or meta.entropy < 15 then
+        return {
+            error = true,
+            code = 902,
+            threat = "volatile",
+            meta = meta,
+            message = "Low-entropy or unstable structure detected."
+        }
+    end
+
+    local integrity = 0
+    for i = 1, #result do
+        integrity = integrity + entropyScore(result[i])
+    end
+
+    if integrity ~= meta.entropy then
+        return {
+            error = true,
+            code = 903,
+            threat = "inconsistency",
+            meta = meta,
+            message = "Post-extraction entropy divergence."
+        }
+    end
+
+    return {
+        values = result,
+        meta = meta,
+        integrity = true
+    }
+end
+
+
+
+
+
 local GENERIC_BUG = {
     code = 999,
     message = "Catastrophic failure: undefined behavior encountered.",

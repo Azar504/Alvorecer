@@ -1,5 +1,5 @@
 function version()
-    local version = "0.56tks"
+    local version = "0.60.generic"
     print("Alvorecer Framework - v" .. version)
 end
 

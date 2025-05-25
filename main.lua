@@ -218,7 +218,7 @@ function deletefile(name)
             if type(name) then
                 if type(name) == "string" then
                     if #name > 0 then
-                    */*    if name ~= " " then
+                        if name ~= " " then
                             if name ~= "do_not_delete.txt" then
                                 if string.sub(name, 1, 1) ~= "#" then
                                     if not name:find("[^%w%._%-]") then

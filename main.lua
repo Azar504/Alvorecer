@@ -1589,4 +1589,6 @@ function memorymanager.getcurrentmemory()
 	return collectgarbage("count")
 end
 
-function 
+function memorymanager.autotune()
+	local mem = memorymanager.getcurrentmemory()
+	local factor = math.maxS

@@ -1584,4 +1584,6 @@ memorymanager.maxPause = 150
 memorymanager.minStepMul = 100
 memorymanager.maxStepMul = 500 
 
-function 
+function memorymanager.getcurrentmemory()
+	collectgarbage("count")
+	

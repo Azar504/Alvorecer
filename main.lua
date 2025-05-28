@@ -1591,4 +1591,4 @@ end
 
 function memorymanager.autotune()
 	local mem = memorymanager.getcurrentmemory()
-	local factor = math.maxS
+	local factor = math.max(0.1, max.min(2, mem / memorymanager.targetMemoryKb))

@@ -1,5 +1,5 @@
 function version()
-    local version = "0.60.table"
+    local version = "0.90.InteligiGC"
     print("Alvorecer Framework - v" .. version)
 end
 

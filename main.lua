@@ -1586,4 +1586,7 @@ memorymanager.maxStepMul = 500
 
 function memorymanager.getcurrentmemory()
 	collectgarbage("count")
-	
+	return collectgarbage("count")
+end
+
+function 

@@ -1574,4 +1574,8 @@ function returnbug()
 end
 
 
-function GarbagManager()
+------------------- GC manager update -------------------
+
+local memorymanager = {}
+
+memorymanager.Target

@@ -1750,5 +1750,5 @@ end
 
 return memorymanager
 
-local memorymanager = require("memorymanager")
-
+memorymanager.update()
+memorymanager.fullcleanup()

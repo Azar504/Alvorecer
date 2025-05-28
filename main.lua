@@ -1574,3 +1574,4 @@ function returnbug()
 end
 
 
+function GarbagManager()

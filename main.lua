@@ -1581,4 +1581,5 @@ local memorymanager = {}
 memorymanager.targetMemoryKb = 10240
 memorymanager.minPause = 50
 memorymanager.maxPause = 150
-memorymanager.minStepMul = 1
+memorymanager.minStepMul = 100
+memorymanager.maxStepMul = 500

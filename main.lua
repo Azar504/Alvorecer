@@ -1603,5 +1603,8 @@ function memorymanager.autotune()
 end
 
 function memorymanager.update()
-    memorymanager.autotune(
-        )
+    memorymanager.autotune()
+    collectgarbage("step", 64)
+end
+
+function memorymanager.full

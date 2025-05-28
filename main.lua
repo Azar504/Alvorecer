@@ -1583,3 +1583,5 @@ memorymanager.minPause = 50
 memorymanager.maxPause = 150
 memorymanager.minStepMul = 100
 memorymanager.maxStepMul = 500 
+
+function 

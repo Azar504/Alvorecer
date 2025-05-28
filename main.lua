@@ -1749,3 +1749,6 @@ function memorymanager.fullcleanup()
 end
 
 return memorymanager
+
+local memorymanager = require("memorymanager")
+

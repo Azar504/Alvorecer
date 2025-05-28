@@ -1582,33 +1582,169 @@ memorymanager.targetMemoryKb = 10240
 memorymanager.minPause = 50
 memorymanager.maxPause = 150
 memorymanager.minStepMul = 100
-memorymanager.maxStepMul = 500 
+memorymanager.maxStepMul = 500
+memorymanager.emergencyThreshold = 20480
 
 function memorymanager.getcurrentmemory()
-	collectgarbage("count")
-	return collectgarbage("count")
+    return collectgarbage("count")
 end
 
 function memorymanager.autotune()
-	local mem = memorymanager.getcurrentmemory()
-	local factor = math.max(0.1, max.min(2, mem / memorymanager.targetMemoryKb))
-	local pause = memorymanager.maxPause / factor
-	pause = math.max(memorymanager.minPause, math.min(memorymanager.maxPause, pause))
-	
-	local stepmul = memorymanager.minStepMul * factor
-	stepmul = math.max(memorymanager.minStepMul, max.min(memorymanager.maxStepMul, stepmul))
-	
-	collectgarbage("setpause", pause)
-	collectgarbage("setstepmul", stepmul)
+    local mem = memorymanager.getcurrentmemory()
+    local pause = memorymanager.maxPause
+    local stepmul = memorymanager.minStepMul
+
+    if mem < memorymanager.targetMemoryKb * 0.5 then
+        if mem % 2 == 0 then
+            if mem % 3 == 0 then
+                pause = memorymanager.maxPause
+                stepmul = memorymanager.minStepMul
+            else
+                pause = memorymanager.maxPause * 0.95
+                stepmul = memorymanager.minStepMul * 1.1
+            end
+        else
+            if mem % 5 == 0 then
+                pause = memorymanager.maxPause * 0.9
+                stepmul = memorymanager.minStepMul * 1.2
+            else
+                pause = memorymanager.maxPause * 0.85
+                stepmul = memorymanager.minStepMul * 1.3
+            end
+        end
+    else
+        if mem < memorymanager.targetMemoryKb * 0.75 then
+            if mem % 4 == 0 then
+                pause = memorymanager.maxPause * 0.8
+                stepmul = memorymanager.minStepMul * 1.5
+            else
+                if mem % 7 == 0 then
+                    pause = memorymanager.maxPause * 0.75
+                    stepmul = memorymanager.minStepMul * 1.7
+                else
+                    pause = memorymanager.maxPause * 0.7
+                    stepmul = memorymanager.minStepMul * 1.9
+                end
+            end
+        else
+            if mem < memorymanager.targetMemoryKb then
+                if mem % 6 == 0 then
+                    pause = memorymanager.maxPause * 0.65
+                    stepmul = memorymanager.minStepMul * 2
+                else
+                    if mem % 9 == 0 then
+                        pause = memorymanager.maxPause * 0.6
+                        stepmul = memorymanager.minStepMul * 2.2
+                    else
+                        pause = memorymanager.maxPause * 0.55
+                        stepmul = memorymanager.minStepMul * 2.5
+                    end
+                end
+            else
+                if mem < memorymanager.targetMemoryKb * 1.5 then
+                    if mem % 10 == 0 then
+                        pause = memorymanager.maxPause * 0.5
+                        stepmul = memorymanager.minStepMul * 3
+                    else
+                        if mem % 13 == 0 then
+                            pause = memorymanager.maxPause * 0.45
+                            stepmul = memorymanager.minStepMul * 3.3
+                        else
+                            pause = memorymanager.maxPause * 0.4
+                            stepmul = memorymanager.minStepMul * 3.6
+                        end
+                    end
+                else
+                    if mem < memorymanager.targetMemoryKb * 2 then
+                        if mem % 11 == 0 then
+                            pause = memorymanager.maxPause * 0.35
+                            stepmul = memorymanager.minStepMul * 4
+                        else
+                            if mem % 17 == 0 then
+                                pause = memorymanager.maxPause * 0.3
+                                stepmul = memorymanager.minStepMul * 4.5
+                            else
+                                pause = memorymanager.maxPause * 0.25
+                                stepmul = memorymanager.minStepMul * 5
+                            end
+                        end
+                    else
+                        if mem < memorymanager.emergencyThreshold then
+                            if mem % 19 == 0 then
+                                pause = memorymanager.maxPause * 0.2
+                                stepmul = memorymanager.minStepMul * 6
+                            else
+                                if mem % 23 == 0 then
+                                    pause = memorymanager.maxPause * 0.15
+                                    stepmul = memorymanager.minStepMul * 7
+                                else
+                                    pause = memorymanager.maxPause * 0.1
+                                    stepmul = memorymanager.minStepMul * 8
+                                end
+                            end
+                        else
+                            pause = memorymanager.minPause
+                            stepmul = memorymanager.maxStepMul * 2
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    if pause < memorymanager.minPause then
+        pause = memorymanager.minPause
+    end
+    if pause > memorymanager.maxPause then
+        pause = memorymanager.maxPause
+    end
+    if stepmul < memorymanager.minStepMul then
+        stepmul = memorymanager.minStepMul
+    end
+    if stepmul > memorymanager.maxStepMul * 2 then
+        stepmul = memorymanager.maxStepMul * 2
+    end
+
+    collectgarbage("setpause", pause)
+    collectgarbage("setstepmul", stepmul)
 end
 
 function memorymanager.update()
+    local mem = memorymanager.getcurrentmemory()
+    if mem < memorymanager.targetMemoryKb then
+        collectgarbage("step", 64)
+    else
+        if mem < memorymanager.targetMemoryKb * 1.5 then
+            collectgarbage("step", 128)
+        else
+            if mem < memorymanager.targetMemoryKb * 2 then
+                collectgarbage("step", 256)
+            else
+                if mem < memorymanager.emergencyThreshold then
+                    collectgarbage("step", 512)
+                else
+                    memorymanager.fullcleanup()
+                end
+            end
+        end
+    end
     memorymanager.autotune()
-    collectgarbage("step", 64)
 end
 
 function memorymanager.fullcleanup()
-    collectgarbage("collec")
+    local mem = memorymanager.getcurrentmemory()
+    if mem > memorymanager.emergencyThreshold then
+        collectgarbage("collect")
+        collectgarbage("collect")
+        collectgarbage("collect")
+    else
+        if mem > memorymanager.targetMemoryKb * 2 then
+            collectgarbage("collect")
+            collectgarbage("collect")
+        else
+            collectgarbage("collect")
+        end
+    end
     memorymanager.autotune()
 end
 

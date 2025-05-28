@@ -1596,3 +1596,4 @@ function memorymanager.autotune()
 	pause = math.max(memorymanager.minPause, math.min(memorymanager.maxPause, pause))
 	
 	local stepmul = memorymanager.minStepMul * factor
+	stepmul = math.max(memorymanager.minStepMul, ma)

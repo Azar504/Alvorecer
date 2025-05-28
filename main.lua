@@ -1578,4 +1578,6 @@ end
 
 local memorymanager = {}
 
-memorymanager.Target
+memorymanager.targetMemoryKb = 10240
+memorymanager.minPause 50
+memorymanager.
